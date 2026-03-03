@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cycling Investment Dashboard — Amit Kamat</title>
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:    #007AFF;
+  --indigo:  #5856D6;
+  --purple:  #AF52DE;
+  --pink:    #FF2D55;
+  --orange:  #FF9500;
+  --yellow:  #FFCC00;
+  --green:   #34C759;
+  --teal:    #5AC8FA;
+  --red:     #FF3B30;
+  --bg:      #F2F2F7;
+  --card:    #FFFFFF;
+  --label1:  #000000;
+  --label2:  #1C1C1E;
+  --label3:  rgba(60,60,67,0.6);
+  --label4:  rgba(60,60,67,0.3);
+  --sep:     rgba(60,60,67,0.12);
+}
+
+body {
+  font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--label1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+.app { max-width: 680px; margin: 0 auto; }
+
+/* ── HEADER ── */
+.hero {
+  background: linear-gradient(160deg, #09090F 0%, #1A1A2E 55%, #0F0F20 100%);
+  padding: 56px 22px 0;
+  position: relative;
+  overflow: hidden;
+}
+.hero-blob {
+  position: absolute; border-radius: 50%; pointer-events: none;
+}
+.hero-blob-1 { top:-80px; right:-60px; width:280px; height:280px; background:radial-gradient(circle,rgba(0,122,255,.22) 0%,transparent 70%); }
+.hero-blob-2 { top:20px;  left:-80px;  width:210px; height:210px; background:radial-gradient(circle,rgba(88,86,214,.18) 0%,transparent 70%); }
+.hero-blob-3 { bottom:0;  right:40px;  width:170px; height:170px; background:radial-gradient(circle,rgba(90,200,250,.12) 0%,transparent 70%); }
+
+.hero-content { position: relative; z-index: 1; }
+
+.hero-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 10px;
+}
+.hero-name   { font-size: 36px; font-weight: 800; color:#fff; letter-spacing:-1.2px; line-height:1.05; margin-bottom:6px; }
+.hero-sub    { font-size: 14px; color:rgba(255,255,255,.42); font-weight:400; margin-bottom:22px; }
+
+/* TOTAL GLASS CARD */
+.hero-total {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 22px;
+  padding: 22px 22px 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  margin-bottom: 20px;
+}
+.hero-total-lbl { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-bottom:6px; }
+.hero-total-val { font-size:54px; font-weight:800; color:#fff; letter-spacing:-3px; line-height:1; margin-bottom:18px; }
+.hero-total-val span { font-size:28px; font-weight:600; color:rgba(255,255,255,.42); }
+.hero-stats { display:flex; gap:22px; flex-wrap:wrap; }
+.hero-stat-val { font-size:16px; font-weight:700; color:#fff; }
+.hero-stat-lbl { font-size:11px; color:rgba(255,255,255,.4); font-weight:500; margin-top:2px; }
+
+.hero-badges { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.hero-badge {
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px; padding:5px 12px;
+  font-size:12px; color:rgba(255,255,255,.7); font-weight:500;
+}
+
+/* TAB BAR */
+.tab-bar {
+  display:flex;
+  background:rgba(255,255,255,.07);
+  border-radius:16px 16px 0 0;
+  padding:6px 6px 0;
+  gap:2px;
+  position:relative; z-index:1;
+}
+.tab-btn {
+  flex:1; border:none; cursor:pointer;
+  padding:10px 6px;
+  border-radius:12px 12px 0 0;
+  background:transparent;
+  color:rgba(255,255,255,.45);
+  font-size:11px; font-weight:600;
+  transition:all .2s ease;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  font-family:inherit;
+  line-height:1;
+}
+.tab-btn.active { background:var(--bg); color:var(--blue); }
+.tab-btn .tab-icon { font-size:18px; }
+
+/* ── CONTENT ── */
+.content { padding:16px 16px 40px; }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* ── SECTION LABEL ── */
+.section-lbl {
+  font-size:20px; font-weight:700; letter-spacing:-.4px;
+  color:var(--label1); margin:26px 0 12px; padding-left:2px;
+}
+
+/* ── CARD ── */
+.card {
+  background:var(--card);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 2px 16px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.05);
+  margin-bottom:14px;
+}
+.card-title {
+  font-size:11px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--label3); margin-bottom:16px;
+}
+
+/* ── GRID ── */
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px; }
+
+/* ── QUICK STATS ── */
+.stat-card { background:var(--card); border-radius:18px; padding:18px 16px; box-shadow:0 2px 14px rgba(0,0,0,.06); }
+.stat-icon { font-size:26px; margin-bottom:10px; }
+.stat-val  { font-size:30px; font-weight:700; letter-spacing:-.6px; color:var(--label1); }
+.stat-lbl  { font-size:11px; color:var(--label3); font-weight:500; margin-top:3px; }
+
+/* ── DONUT ── */
+.donut-wrap { position:relative; width:180px; height:180px; margin:0 auto 20px; }
+.donut-center {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%); text-align:center;
+}
+.donut-center-val { font-size:20px; font-weight:700; letter-spacing:-.5px; }
+.donut-center-lbl { font-size:10px; color:var(--label3); font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+.donut-svg { transform:rotate(-90deg); }
+
+/* ── LEGEND ── */
+.legend { display:flex; flex-direction:column; gap:13px; }
+.legend-item { display:flex; align-items:center; justify-content:space-between; }
+.legend-left { display:flex; align-items:center; gap:9px; }
+.legend-dot  { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.legend-name { font-size:13px; font-weight:500; color:var(--label2); }
+.legend-val  { font-size:14px; font-weight:700; }
+.legend-pct  { font-size:11px; color:var(--label3); margin-left:5px; }
+
+/* ── BAR CHART ── */
+.bar-list { display:flex; flex-direction:column; gap:14px; }
+.bar-meta { display:flex; justify-content:space-between; margin-bottom:6px; align-items:baseline; }
+.bar-name { font-size:13px; font-weight:500; color:var(--label2); }
+.bar-amt  { font-size:13px; font-weight:700; }
+.bar-track { height:7px; background:var(--bg); border-radius:4px; overflow:hidden; }
+.bar-fill  { height:100%; border-radius:4px; width:0; transition:width 1s cubic-bezier(.34,1.2,.64,1); }
+
+/* ── VERTICAL BAR ── */
+.vbar-wrap {
+  display:flex; align-items:flex-end; gap:8px;
+  height:130px; margin-bottom:8px;
+}
+.vbar-col { flex:1; display:flex; flex-direction:column; align-items:center; height:100%; }
+.vbar-col .vbar-bar { width:100%; border-radius:8px 8px 3px 3px; transition:height 1s cubic-bezier(.34,1.2,.64,1); height:0; }
+.vbar-col .vbar-yr { font-size:10px; font-weight:600; color:var(--label3); margin-top:6px; }
+
+/* ── ROW LISTS ── */
+.row-list .row-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid var(--sep);
+  gap:12px;
+}
+.row-list .row-item:last-child { border-bottom:none; }
+.row-left { display:flex; align-items:center; gap:12px; flex:1; min-width:0; }
+.row-ico  { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.row-title { font-size:14px; font-weight:600; color:var(--label1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.row-sub   { font-size:11px; color:var(--label3); margin-top:2px; }
+.row-right { text-align:right; flex-shrink:0; }
+.row-amt   { font-size:15px; font-weight:700; }
+.row-tag   { display:inline-block; border-radius:6px; padding:2px 7px; font-size:10px; font-weight:700; margin-top:3px; }
+
+/* ── TOTAL ROW ── */
+.total-row {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:12px; padding:15px 18px;
+  background:linear-gradient(135deg,var(--blue) 0%,var(--indigo) 100%);
+  border-radius:14px;
+}
+.total-row-lbl { font-size:13px; font-weight:700; color:rgba(255,255,255,.75); }
+.total-row-val { font-size:22px; font-weight:800; color:#fff; letter-spacing:-.5px; }
+
+/* ── BIKE CARDS ── */
+.bike-card { border-radius:22px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,.12); margin-bottom:16px; }
+.bike-header { padding:24px 22px; position:relative; overflow:hidden; }
+.bike-header-bg { position:absolute; right:-20px; top:-20px; font-size:110px; opacity:.1; line-height:1; }
+.bike-emoji  { font-size:32px; margin-bottom:10px; position:relative; z-index:1; }
+.bike-name   { font-size:26px; font-weight:800; color:#fff; letter-spacing:-.8px; margin-bottom:2px; position:relative; z-index:1; }
+.bike-year   { font-size:13px; color:rgba(255,255,255,.6); margin-bottom:14px; position:relative; z-index:1; }
+.bike-price  { font-size:44px; font-weight:800; color:#fff; letter-spacing:-2px; position:relative; z-index:1; }
+.bike-retailer { font-size:12px; color:rgba(255,255,255,.48); margin-top:3px; position:relative; z-index:1; }
+.bike-tags   { display:flex; gap:6px; flex-wrap:wrap; margin-top:14px; position:relative; z-index:1; }
+.bike-tag    { background:rgba(255,255,255,.18); color:#fff; border-radius:8px; padding:4px 10px; font-size:11px; font-weight:600; }
+.bike-body   { background:#fff; }
+.bike-row    { display:flex; justify-content:space-between; align-items:center; padding:13px 22px; border-bottom:1px solid var(--sep); }
+.bike-row:last-child { border-bottom:none; }
+.bike-row-lbl { font-size:13px; color:var(--label3); font-weight:500; }
+.bike-row-val { font-size:13px; font-weight:600; color:var(--label1); max-width:58%; text-align:right; }
+.bike-footer  { padding:14px 22px; border-top-width:1px; border-top-style:solid; }
+.bike-footer-lbl { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+.bike-footer-val { font-size:13px; font-weight:500; color:var(--label1); }
+
+/* ── COMBINED BANNER ── */
+.combined-banner {
+  background:linear-gradient(135deg,var(--blue) 0%,var(--indigo) 100%);
+  border-radius:20px; text-align:center; padding:26px 20px;
+  margin-bottom:16px; box-shadow:0 4px 20px rgba(0,122,255,.3);
+}
+.combined-lbl { font-size:12px; font-weight:600; color:rgba(255,255,255,.55); letter-spacing:.06em; text-transform:uppercase; margin-bottom:4px; }
+.combined-val { font-size:48px; font-weight:800; color:#fff; letter-spacing:-2px; }
+.combined-sub { font-size:13px; color:rgba(255,255,255,.5); margin-top:4px; }
+
+/* ── SERVICE CHIPS ── */
+.svc-chips { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+.svc-chip { background:var(--bg); border-radius:14px; padding:13px 16px; min-width:120px; }
+.svc-chip-val { font-size:20px; font-weight:700; margin-bottom:4px; }
+.svc-chip-lbl { font-size:11px; color:var(--label3); line-height:1.4; }
+
+/* ── BRAND COMPARE ── */
+.brand-col { border-radius:20px; overflow:hidden; box-shadow:0 4px 18px rgba(0,0,0,.09); }
+.brand-header { padding:18px 16px; }
+.brand-header-ico  { font-size:28px; margin-bottom:6px; }
+.brand-header-name { font-size:17px; font-weight:800; color:#fff; letter-spacing:-.3px; }
+.brand-header-val  { font-size:30px; font-weight:800; color:#fff; letter-spacing:-1.2px; margin-top:6px; }
+.brand-header-sub  { font-size:11px; color:rgba(255,255,255,.5); margin-top:3px; }
+.brand-body { background:#fff; padding:12px 16px; }
+.brand-body-row { display:flex; justify-content:space-between; font-size:12px; padding:4px 0; }
+.brand-body-lbl { color:var(--label3); }
+.brand-body-val { font-weight:600; }
+
+/* ── ORDER ROWS ── */
+.order-summary {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:12px; padding:13px 16px;
+  border-radius:13px;
+}
+.order-summary-group { text-align:center; }
+.order-summary-lbl { font-size:11px; color:var(--label3); margin-bottom:3px; }
+.order-summary-val { font-size:17px; font-weight:700; }
+
+/* ── TIMELINE ── */
+.tl-item { display:flex; gap:14px; padding-bottom:20px; position:relative; }
+.tl-item:last-child { padding-bottom:0; }
+.tl-connector {
+  position:absolute; left:21px; top:44px; bottom:0; width:2px;
+  background:var(--sep);
+}
+.tl-ico { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; z-index:1; }
+.tl-body { flex:1; }
+.tl-date  { font-size:11px; color:var(--label3); margin-bottom:2px; }
+.tl-title { font-size:14px; font-weight:700; color:var(--label1); }
+.tl-sub   { font-size:12px; color:var(--label3); margin-top:3px; line-height:1.4; }
+.tl-right { text-align:right; flex-shrink:0; }
+.tl-amt   { font-size:16px; font-weight:800; letter-spacing:-.3px; }
+.tl-tag   { display:inline-block; border-radius:6px; padding:2px 8px; font-size:10px; font-weight:700; margin-top:4px; }
+
+/* ── FACT CARDS ── */
+.fact-card { background:var(--card); border-radius:18px; padding:20px 14px; text-align:center; box-shadow:0 2px 14px rgba(0,0,0,.06); }
+.fact-icon { font-size:24px; margin-bottom:10px; }
+.fact-val  { font-size:28px; font-weight:800; letter-spacing:-.8px; }
+.fact-name { font-size:12px; font-weight:700; color:var(--label1); margin:5px 0 3px; }
+.fact-desc { font-size:11px; color:var(--label3); line-height:1.5; }
+
+/* ── EVIDENCE ── */
+.ev-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--sep); }
+.ev-item:last-child { border-bottom:none; }
+.ev-lbl { font-size:14px; font-weight:500; color:var(--label1); }
+.ev-chip { border-radius:8px; padding:4px 10px; font-size:12px; font-weight:600; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.card, .stat-card, .bike-card, .combined-banner, .brand-col, .fact-card {
+  animation: fadeUp .45s ease both;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px) {
+  .grid3 { grid-template-columns:1fr 1fr; }
+  .hero-total-val { font-size:42px; }
+  .bike-price { font-size:36px; }
+}
+@media(max-width:360px) {
+  .grid3 { grid-template-columns:1fr 1fr; }
+  .grid2 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════════ HERO ══════════════ -->
+<div class="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Cycling Investment Portfolio</div>
+    <div class="hero-name">Amit Kamat</div>
+    <div class="hero-sub">2020 – 2026 · All Email & Invoice-Verified Purchases</div>
+
+    <div class="hero-total">
+      <div class="hero-total-lbl">Total Confirmed Investment</div>
+      <div class="hero-total-val">£12,400<span>.86</span></div>
+      <div class="hero-stats">
+        <div><div class="hero-stat-val">£7,500</div><div class="hero-stat-lbl">Bikes · 60.5%</div></div>
+        <div><div class="hero-stat-val">£2,518</div><div class="hero-stat-lbl">Clothing · 20.3%</div></div>
+        <div><div class="hero-stat-val">£1,129</div><div class="hero-stat-lbl">Services · 9.1%</div></div>
+        <div><div class="hero-stat-val">£980</div><div class="hero-stat-lbl">Electronics · 7.9%</div></div>
+      </div>
+    </div>
+
+    <div class="hero-badges">
+      <div class="hero-badge">✅ 100% Verified</div>
+      <div class="hero-badge">📄 March 2026</div>
+      <div class="hero-badge">🚲 2 Bikes</div>
+      <div class="hero-badge">6 Years</div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('overview',this)">
+      <span class="tab-icon">⬡</span><span>Overview</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('bikes',this)">
+      <span class="tab-icon">🚲</span><span>Bikes</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('clothing',this)">
+      <span class="tab-icon">👕</span><span>Clothing</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('timeline',this)">
+      <span class="tab-icon">📅</span><span>Timeline</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ CONTENT ══════════════ -->
+<div class="content">
+
+  <!-- ════ OVERVIEW ════ -->
+  <div id="tab-overview" class="tab-panel active">
+
+    <!-- Quick Stats -->
+    <div class="grid3">
+      <div class="stat-card" style="animation-delay:.05s">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-val">2</div>
+        <div class="stat-lbl">Premium Bikes</div>
+      </div>
+      <div class="stat-card" style="animation-delay:.1s">
+        <div class="stat-icon">🛍️</div>
+        <div class="stat-val">14</div>
+        <div class="stat-lbl">Total Orders</div>
+      </div>
+      <div class="stat-card" style="animation-delay:.15s">
+        <div class="stat-icon">🔧</div>
+        <div class="stat-val">4</div>
+        <div class="stat-lbl">Pro Services</div>
+      </div>
+    </div>
+
+    <!-- Spend Breakdown + Donut -->
+    <div class="section-lbl">Spend Breakdown</div>
+    <div class="card" style="animation-delay:.2s">
+      <div class="card-title">By Category</div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" viewBox="0 0 180 180" width="180" height="180">
+          <!-- background ring -->
+          <circle cx="90" cy="90" r="70" fill="none" stroke="rgba(120,120,128,.1)" stroke-width="22"/>
+          <!-- Bikes 60.5% → dasharray = pct/100 * 2πr = .605 * 439.8 = 266.1 -->
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#007AFF" stroke-width="22"
+            stroke-dasharray="266.1 173.7" stroke-dashoffset="0" stroke-linecap="butt"
+            class="donut-seg" data-target="266.1" data-offset="0"/>
+          <!-- Clothing 20.3% → 89.3 -->
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#FF9500" stroke-width="22"
+            stroke-dasharray="89.3 350.5" stroke-dashoffset="-266.1" stroke-linecap="butt"
+            class="donut-seg" data-target="89.3" data-offset="-266.1"/>
+          <!-- Services 9.1% → 40.0 -->
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#5856D6" stroke-width="22"
+            stroke-dasharray="40.0 399.8" stroke-dashoffset="-355.4" stroke-linecap="butt"
+            class="donut-seg" data-target="40.0" data-offset="-355.4"/>
+          <!-- Electronics 7.9% → 34.7 -->
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#34C759" stroke-width="22"
+            stroke-dasharray="34.7 405.1" stroke-dashoffset="-395.4" stroke-linecap="butt"
+            class="donut-seg" data-target="34.7" data-offset="-395.4"/>
+          <!-- Camera 2.4% → 10.6 -->
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#5AC8FA" stroke-width="22"
+            stroke-dasharray="10.6 429.2" stroke-dashoffset="-430.1" stroke-linecap="butt"
+            class="donut-seg" data-target="10.6" data-offset="-430.1"/>
+          <!-- Memberships 1.2% → 5.3 -->
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#FF2D55" stroke-width="22"
+            stroke-dasharray="5.3 434.5" stroke-dashoffset="-440.7" stroke-linecap="butt"
+            class="donut-seg" data-target="5.3" data-offset="-440.7"/>
+          <!-- Tyres 0.8% → 3.5 -->
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#FF6B00" stroke-width="22"
+            stroke-dasharray="3.5 436.3" stroke-dashoffset="-446.0" stroke-linecap="butt"
+            class="donut-seg" data-target="3.5" data-offset="-446.0"/>
+        </svg>
+        <div class="donut-center">
+          <div class="donut-center-val">£12.4k</div>
+          <div class="donut-center-lbl">Total</div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-left"><div class="legend-dot" style="background:#007AFF"></div><div class="legend-name">🚲 Bikes</div></div>
+          <div><span class="legend-val" style="color:#007AFF">£7,500</span><span class="legend-pct">60.5%</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-left"><div class="legend-dot" style="background:#FF9500"></div><div class="legend-name">👕 Clothing</div></div>
+          <div><span class="legend-val" style="color:#FF9500">£2,518</span><span class="legend-pct">20.3%</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-left"><div class="legend-dot" style="background:#5856D6"></div><div class="legend-name">🔧 Services</div></div>
+          <div><span class="legend-val" style="color:#5856D6">£1,129</span><span class="legend-pct">9.1%</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-left"><div class="legend-dot" style="background:#34C759"></div><div class="legend-name">📡 Electronics</div></div>
+          <div><span class="legend-val" style="color:#34C759">£980</span><span class="legend-pct">7.9%</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-left"><div class="legend-dot" style="background:#5AC8FA"></div><div class="legend-name">📷 Camera</div></div>
+          <div><span class="legend-val" style="color:#5AC8FA">£300</span><span class="legend-pct">2.4%</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-left"><div class="legend-dot" style="background:#FF2D55"></div><div class="legend-name">🎫 Memberships</div></div>
+          <div><span class="legend-val" style="color:#FF2D55">£147</span><span class="legend-pct">1.2%</span></div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-left"><div class="legend-dot" style="background:#FF6B00"></div><div class="legend-name">🛞 Tyres</div></div>
+          <div><span class="legend-val" style="color:#FF6B00">£102</span><span class="legend-pct">0.8%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Year-by-Year -->
+    <div class="section-lbl">Year-by-Year Spend</div>
+    <div class="card" style="animation-delay:.25s">
+      <div class="card-title">Annual Investment</div>
+      <div class="vbar-wrap" id="vbar-container">
+        <!-- bars injected by JS -->
+      </div>
+      <div style="height:1px;background:var(--sep);margin:12px 0"></div>
+      <div class="bar-list" id="year-bars"></div>
+    </div>
+
+    <!-- All Purchases -->
+    <div class="section-lbl">All Confirmed Purchases</div>
+    <div class="card" style="animation-delay:.3s">
+      <div class="card-title">Sorted Largest First</div>
+      <div class="row-list" id="all-items"></div>
+      <div class="total-row">
+        <div class="total-row-lbl">GRAND TOTAL · ALL CONFIRMED</div>
+        <div class="total-row-val">£12,400.86</div>
+      </div>
+    </div>
+
+    <!-- Notable Facts -->
+    <div class="section-lbl">Notable Facts</div>
+    <div class="grid2">
+      <div class="fact-card" style="animation-delay:.35s">
+        <div class="fact-icon">↩️</div>
+        <div class="fact-val" style="color:#34C759">£577</div>
+        <div class="fact-name">Rapha Returns</div>
+        <div class="fact-desc">Cargo tights + Technical trousers — full refund</div>
+      </div>
+      <div class="fact-card" style="animation-delay:.4s">
+        <div class="fact-icon">🎁</div>
+        <div class="fact-val" style="color:#FF9500">£394</div>
+        <div class="fact-name">CdC Gift Card</div>
+        <div class="fact-desc">Stitching failed after 3–4 rides — CdC compensated</div>
+      </div>
+      <div class="fact-card" style="animation-delay:.45s">
+        <div class="fact-icon">💰</div>
+        <div class="fact-val" style="color:#5856D6">£123</div>
+        <div class="fact-name">Bike Fit Rebate</div>
+        <div class="fact-desc">SSC rebated £122.50 of fit cost vs Cervélo price</div>
+      </div>
+      <div class="fact-card" style="animation-delay:.5s">
+        <div class="fact-icon">📐</div>
+        <div class="fact-val" style="color:#007AFF">Free</div>
+        <div class="fact-name">3D Motion Fit</div>
+        <div class="fact-desc">Included with Giant store Orro purchase — Aug 2024</div>
+      </div>
+    </div>
+
+    <!-- Evidence Status -->
+    <div class="section-lbl">Evidence Status</div>
+    <div class="card" style="animation-delay:.55s">
+      <div class="ev-item">
+        <div class="ev-lbl">Original invoices uploaded</div>
+        <div class="ev-chip" style="background:rgba(52,199,89,.12);color:#34C759">✓ 5 docs</div>
+      </div>
+      <div class="ev-item">
+        <div class="ev-lbl">Email order confirmations</div>
+        <div class="ev-chip" style="background:rgba(52,199,89,.12);color:#34C759">✓ 9 orders</div>
+      </div>
+      <div class="ev-item">
+        <div class="ev-lbl">Orro Gold Disc — Invoice #2668</div>
+        <div class="ev-chip" style="background:rgba(52,199,89,.12);color:#34C759">✓ Aug 2020</div>
+      </div>
+      <div class="ev-item">
+        <div class="ev-lbl">Cervélo — Txn #23838279</div>
+        <div class="ev-chip" style="background:rgba(52,199,89,.12);color:#34C759">✓ Apr 2025</div>
+      </div>
+      <div class="ev-item">
+        <div class="ev-lbl">Giant receipts (Oct/Jan/Feb)</div>
+        <div class="ev-chip" style="background:rgba(255,149,0,.12);color:#FF9500">⏳ 3 pending</div>
+      </div>
+    </div>
+
+  </div><!-- /overview -->
+
+  <!-- ════ BIKES ════ -->
+  <div id="tab-bikes" class="tab-panel">
+    <div class="section-lbl">The Stable</div>
+
+    <!-- Orro -->
+    <div class="bike-card" style="animation-delay:.05s">
+      <div class="bike-header" style="background:linear-gradient(135deg,#007AFF 0%,#5AC8FA 100%)">
+        <div class="bike-header-bg">🚲</div>
+        <div class="bike-emoji">🏅</div>
+        <div class="bike-name">Orro Gold Disc</div>
+        <div class="bike-year">2020 · 54cm frame</div>
+        <div class="bike-price">£2,500</div>
+        <div class="bike-retailer">Elite Cycling Ltd · Invoice #2668 · 22 Aug 2020</div>
+        <div class="bike-tags">
+          <div class="bike-tag">Carbon Frame</div>
+          <div class="bike-tag">Hydraulic Disc</div>
+          <div class="bike-tag">Ultegra 8020</div>
+        </div>
+      </div>
+      <div class="bike-body">
+        <div class="bike-row"><div class="bike-row-lbl">Groupset</div><div class="bike-row-val">Shimano Ultegra 8020 Disc</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Wheels</div><div class="bike-row-val">Fulcrum Racing 500 DB</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Tyres</div><div class="bike-row-val">Continental Grand Prix 25C</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Chainset</div><div class="bike-row-val">52-36 · Cassette 11-30</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Bars / Stem</div><div class="bike-row-val">Deda Zero 1</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Retailer</div><div class="bike-row-val">Elite Cycling Ltd, Streatham Vale</div></div>
+      </div>
+      <div class="bike-footer" style="background:rgba(0,122,255,.07);border-top-color:rgba(0,122,255,.15)">
+        <div class="bike-footer-lbl" style="color:#007AFF">Bike Fit — Aug 2024</div>
+        <div class="bike-footer-val">3D Motion Capture · Cadence Performance / Giant St Pauls · Simon Jackson · FREE</div>
+      </div>
+    </div>
+
+    <!-- Cervelo -->
+    <div class="bike-card" style="animation-delay:.1s">
+      <div class="bike-header" style="background:linear-gradient(135deg,#5856D6 0%,#AF52DE 100%)">
+        <div class="bike-header-bg">🚲</div>
+        <div class="bike-emoji">🏆</div>
+        <div class="bike-name">Cervélo Caledonia-5</div>
+        <div class="bike-year">2025 · 56cm frame</div>
+        <div class="bike-price">£5,000</div>
+        <div class="bike-retailer">Strype Street Cycles · Txn #23838279 · 14 Apr 2025</div>
+        <div class="bike-tags">
+          <div class="bike-tag">Power Meter</div>
+          <div class="bike-tag">AXS Wireless</div>
+          <div class="bike-tag">Cyclescheme</div>
+        </div>
+      </div>
+      <div class="bike-body">
+        <div class="bike-row"><div class="bike-row-lbl">Groupset</div><div class="bike-row-val">SRAM Rival AXS 12-speed</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Wheels</div><div class="bike-row-val">Vision Team i23 Disc</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Tyres</div><div class="bike-row-val">Corsa N.EXT TLR 700×32</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Chainset</div><div class="bike-row-val">SRAM Rival 48/35T · DUB BBright</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">RRP → Paid</div><div class="bike-row-val">£5,500 → £5,122.50 → £5,000 (rebate)</div></div>
+        <div class="bike-row"><div class="bike-row-lbl">Retailer</div><div class="bike-row-val">Strype Street Cycles, Spitalfields</div></div>
+      </div>
+      <div class="bike-footer" style="background:rgba(88,86,214,.07);border-top-color:rgba(88,86,214,.15)">
+        <div class="bike-footer-lbl" style="color:#5856D6">Bike Fit — Mar 2025</div>
+        <div class="bike-footer-val">Jig Fit · Simon, SSC · £240 (£122.50 rebated against bike purchase)</div>
+      </div>
+    </div>
+
+    <div class="combined-banner" style="animation-delay:.15s">
+      <div class="combined-lbl">Combined Bike Investment</div>
+      <div class="combined-val">£7,500</div>
+      <div class="combined-sub">60.5% of total cycling portfolio</div>
+    </div>
+
+    <!-- Service history -->
+    <div class="section-lbl">Service History</div>
+    <div class="card" style="animation-delay:.2s">
+      <div class="card-title">All Workshop & Fitting Services</div>
+      <div class="row-list">
+        <div class="row-item">
+          <div class="row-left">
+            <div class="row-ico" style="background:rgba(88,86,214,.1)">⚙️</div>
+            <div>
+              <div class="row-title">Platinum Service — Cervélo</div>
+              <div class="row-sub">20 Nov 2025 · Giant St Pauls · Txn #27012901</div>
+              <div class="row-sub" style="margin-top:3px">Chain · Cassette · 8× Bearings · Brake Fluid · Pads · Full strip & clean</div>
+            </div>
+          </div>
+          <div class="row-right"><div class="row-amt" style="color:#5856D6">£508.91</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left">
+            <div class="row-ico" style="background:rgba(0,122,255,.1)">📐</div>
+            <div>
+              <div class="row-title">Jig Bike Fit — Cervélo</div>
+              <div class="row-sub">06 Mar 2025 · Strype Street Cycles · Txn #23308693</div>
+              <div class="row-sub" style="margin-top:3px">Full fit session for Cervélo spec. £122.50 rebated vs bike price</div>
+            </div>
+          </div>
+          <div class="row-right"><div class="row-amt" style="color:#007AFF">£240.00</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left">
+            <div class="row-ico" style="background:rgba(255,149,0,.1)">🔩</div>
+            <div>
+              <div class="row-title">Workshop — SP24 Seatpost + Labour</div>
+              <div class="row-sub">01 May 2025 · Strype Street Cycles · Txn #24085119</div>
+              <div class="row-sub" style="margin-top:3px">Rubbing noise fix · stem check · fit mirror installation</div>
+            </div>
+          </div>
+          <div class="row-right"><div class="row-amt" style="color:#FF9500">£180.00</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left">
+            <div class="row-ico" style="background:rgba(52,199,89,.1)">🎯</div>
+            <div>
+              <div class="row-title">3D Motion Capture Bike Fit — Orro</div>
+              <div class="row-sub">23 Aug 2024 · Cadence Performance / Giant St Pauls</div>
+              <div class="row-sub" style="margin-top:3px">STT Systems 3DMA · Fitter: Simon Jackson · 5-page report issued</div>
+            </div>
+          </div>
+          <div class="row-right"><div class="row-amt" style="color:#34C759">FREE</div></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:12px 14px;background:rgba(88,86,214,.06);border-radius:12px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:13px;font-weight:500;color:var(--label2)">Total service spend</div>
+        <div style="font-size:18px;font-weight:800;color:#5856D6">£1,128.91</div>
+      </div>
+    </div>
+
+  </div><!-- /bikes -->
+
+  <!-- ════ CLOTHING ════ -->
+  <div id="tab-clothing" class="tab-panel">
+    <div class="section-lbl">Brand Overview</div>
+    <div class="grid2">
+      <div class="brand-col" style="animation-delay:.05s">
+        <div class="brand-header" style="background:linear-gradient(135deg,#FF2D55,#FF6B81)">
+          <div class="brand-header-ico">🔴</div>
+          <div class="brand-header-name">Rapha</div>
+          <div class="brand-header-val">£1,498</div>
+          <div class="brand-header-sub">net · 8 orders</div>
+        </div>
+        <div class="brand-body">
+          <div class="brand-body-row"><div class="brand-body-lbl">Gross spend</div><div class="brand-body-val">£2,075</div></div>
+          <div class="brand-body-row"><div class="brand-body-lbl">Returns</div><div class="brand-body-val" style="color:#34C759">−£577</div></div>
+        </div>
+      </div>
+      <div class="brand-col" style="animation-delay:.1s">
+        <div class="brand-header" style="background:linear-gradient(135deg,#FF9500,#FFCC00)">
+          <div class="brand-header-ico">☕</div>
+          <div class="brand-header-name">Café du Cycliste</div>
+          <div class="brand-header-val">£1,020</div>
+          <div class="brand-header-sub">net · 3 orders</div>
+        </div>
+        <div class="brand-body">
+          <div class="brand-body-row"><div class="brand-body-lbl">Gross spend</div><div class="brand-body-val">£1,020</div></div>
+          <div class="brand-body-row"><div class="brand-body-lbl">Gift card offset</div><div class="brand-body-val" style="color:#34C759">£394 comp.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rapha Orders -->
+    <div class="section-lbl">Rapha Orders</div>
+    <div class="card" style="animation-delay:.15s">
+      <div class="card-title">8 Orders · Jul 2022 – Jun 2023</div>
+      <div class="bar-list" id="rapha-bars"></div>
+      <div class="order-summary" style="background:rgba(255,45,85,.06)">
+        <div class="order-summary-group"><div class="order-summary-lbl">Gross</div><div class="order-summary-val" style="color:#FF2D55">£2,075</div></div>
+        <div class="order-summary-group"><div class="order-summary-lbl">Returns</div><div class="order-summary-val" style="color:#34C759">−£577</div></div>
+        <div class="order-summary-group"><div class="order-summary-lbl">Net Paid</div><div class="order-summary-val" style="color:#1C1C1E">£1,498</div></div>
+      </div>
+    </div>
+
+    <!-- Rapha detail list -->
+    <div class="card" style="animation-delay:.2s">
+      <div class="card-title">Order Detail</div>
+      <div class="row-list">
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Pro Team Shoes + Brevet L/S Jersey</div><div class="row-sub">23 May 2023 · #101947081</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF2D55">£545</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Rain Jacket + Core Bibs + Lightweight Jersey</div><div class="row-sub">01 Jul 2022 · #098144977</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF2D55">£345</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Glasses + Socks ×2 + Cap (Tights returned)</div><div class="row-sub">03 Apr 2023 · #101665480 · Net after £396 return</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF2D55">£213</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Deep Winter Overshoes + Festive Jersey</div><div class="row-sub">16 Dec 2022 · #100372940</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF2D55">£175</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">POC Omne Air Helmet + Merino Gloves</div><div class="row-sub">06 Dec 2022 · #100243096 · £50 saving</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF2D55">£145</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">RCC Membership</div><div class="row-sub">#101854388 — counted under memberships</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF2D55">£75</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Core Mitts — Warranty Replacement</div><div class="row-sub">20 Jul 2022 · #098336234</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#34C759">FREE</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Technical Trousers ×2 — Full Refund</div><div class="row-sub">29 Jun 2023 · #102478122 · £181 refunded</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#34C759">£0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CDC -->
+    <div class="section-lbl">Café du Cycliste Orders</div>
+    <div class="card" style="animation-delay:.25s">
+      <div class="card-title">3 Orders · Sep – Dec 2023</div>
+      <div class="row-list">
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Elise Bibs + Adrienne Jersey + Petra Jacket</div><div class="row-sub">23 Sep 2023 · #5000020427</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF9500">£632</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Adrienne Bib Shorts + Marceline Jacket</div><div class="row-sub">26 Oct 2023 · #5000020574 · Net after gift card</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF9500">£34</div></div>
+        </div>
+        <div class="row-item">
+          <div class="row-left"><div><div class="row-title">Albertine Jersey + Socks + Gloves</div><div class="row-sub">16 Dec 2023 · #5000021273</div></div></div>
+          <div class="row-right"><div class="row-amt" style="color:#FF9500">£354</div></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:13px 16px;background:rgba(255,149,0,.07);border-radius:12px">
+        <div style="font-size:12px;color:var(--label3);margin-bottom:3px">Quality complaint — stitching failed after 3–4 rides</div>
+        <div style="font-size:14px;font-weight:700;color:#1C1C1E">CdC issued £394 gift card compensation <span style="color:#34C759">✓</span></div>
+      </div>
+    </div>
+
+  </div><!-- /clothing -->
+
+  <!-- ════ TIMELINE ════ -->
+  <div id="tab-timeline" class="tab-panel">
+    <div class="section-lbl">Investment Timeline</div>
+    <div class="card" style="animation-delay:.05s">
+      <div class="card-title">Chronological · 2020 – 2026</div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(0,122,255,.12)">🚲</div>
+        <div class="tl-body"><div class="tl-date">22 Aug 2020 · Elite Cycling Ltd</div><div class="tl-title">Orro Gold Disc</div><div class="tl-sub">54cm · Ultegra 8020 Disc · Invoice #2668 · Confirmed ✓</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#007AFF">£2,500</div><div class="tl-tag" style="background:rgba(0,122,255,.12);color:#007AFF">Bike</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(255,45,85,.12)">👕</div>
+        <div class="tl-body"><div class="tl-date">Jul 2022 – Jun 2023 · Rapha</div><div class="tl-title">Rapha Clothing (8 orders)</div><div class="tl-sub">Net after £577 returns — Rain jacket, shoes, jersey, bibs, helmet, overshoes</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#FF2D55">£1,498</div><div class="tl-tag" style="background:rgba(255,45,85,.12);color:#FF2D55">Clothing</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(52,199,89,.12)">📡</div>
+        <div class="tl-body"><div class="tl-date">08 May 2023 · Garmin</div><div class="tl-title">Garmin Edge 1040 Solar + Varia RCT715</div><div class="tl-sub">Order #104241504175</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#34C759">£979.98</div><div class="tl-tag" style="background:rgba(52,199,89,.12);color:#34C759">Electronics</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(255,149,0,.12)">☕</div>
+        <div class="tl-body"><div class="tl-date">Sep – Dec 2023 · Café du Cycliste</div><div class="tl-title">CdC Clothing (3 orders)</div><div class="tl-sub">Elise · Adrienne · Petra · Marceline · Albertine · Socks · Gloves. Net after £394 gift card.</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#FF9500">£1,020</div><div class="tl-tag" style="background:rgba(255,149,0,.12);color:#FF9500">Clothing</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(255,45,85,.12)">🎫</div>
+        <div class="tl-body"><div class="tl-date">2023 / Various</div><div class="tl-title">Memberships</div><div class="tl-sub">British Cycling Premium #10125638 + Rapha RCC #101854388</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#FF2D55">£147</div><div class="tl-tag" style="background:rgba(255,45,85,.12);color:#FF2D55">Member</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(88,86,214,.12)">⚙️</div>
+        <div class="tl-body"><div class="tl-date">23 Aug 2024 · Cadence Performance / Giant</div><div class="tl-title">3D Motion Capture Bike Fit (Orro)</div><div class="tl-sub">STT Systems 3DMA · Simon Jackson · 5-page report. Included with purchase.</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#34C759">FREE</div><div class="tl-tag" style="background:rgba(52,199,89,.12);color:#34C759">Service</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(88,86,214,.12)">📐</div>
+        <div class="tl-body"><div class="tl-date">06 Mar 2025 · Strype Street Cycles</div><div class="tl-title">Jig Bike Fit — Cervélo</div><div class="tl-sub">Txn #23308693 · £122.50 rebated against bike purchase</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#5856D6">£240</div><div class="tl-tag" style="background:rgba(88,86,214,.12);color:#5856D6">Service</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(88,86,214,.12)">🏆</div>
+        <div class="tl-body"><div class="tl-date">14 Apr 2025 · Strype Street Cycles</div><div class="tl-title">Cervélo Caledonia-5 Rival AXS</div><div class="tl-sub">56cm · SRAM Rival 12-sp w/ power meter · Txn #23838279 · Paid via Cyclescheme</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#5856D6">£5,000</div><div class="tl-tag" style="background:rgba(88,86,214,.12);color:#5856D6">Bike</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(255,149,0,.12)">🔩</div>
+        <div class="tl-body"><div class="tl-date">01 May 2025 · Strype Street Cycles</div><div class="tl-title">Workshop — SP24 Seatpost + Labour</div><div class="tl-sub">Txn #24085119 · Rubbing noise fix + stem check + fit mirror</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#FF9500">£180</div><div class="tl-tag" style="background:rgba(255,149,0,.12);color:#FF9500">Service</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(88,86,214,.12)">⚙️</div>
+        <div class="tl-body"><div class="tl-date">20 Nov 2025 · Giant St Pauls</div><div class="tl-title">Cervélo Platinum Service</div><div class="tl-sub">Txn #27012901 · Chain · Cassette · 8× Wheel Bearings · Brake Fluid · Pads</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#5856D6">£508.91</div><div class="tl-tag" style="background:rgba(88,86,214,.12);color:#5856D6">Service</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-connector"></div>
+        <div class="tl-ico" style="background:rgba(90,200,250,.12)">📷</div>
+        <div class="tl-body"><div class="tl-date">10 Dec 2025 · Costco</div><div class="tl-title">Insta360 GO Ultra Xplorer Bundle</div><div class="tl-sub">Order #775600488 · RRP £339.99 · £40 Costco discount</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#5AC8FA">£299.99</div><div class="tl-tag" style="background:rgba(90,200,250,.12);color:#5AC8FA">Camera</div></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-ico" style="background:rgba(255,107,0,.12)">🛞</div>
+        <div class="tl-body"><div class="tl-date">17 Feb 2026 · Cambrian Tyres</div><div class="tl-title">Continental Gator Hardshell ×2</div><div class="tl-sub">700×32 Black/Black · SO-016523</div></div>
+        <div class="tl-right"><div class="tl-amt" style="color:#FF6B00">£101.98</div><div class="tl-tag" style="background:rgba(255,107,0,.12);color:#FF6B00">Tyres</div></div>
+      </div>
+
+      <div class="total-row" style="margin-top:16px">
+        <div class="total-row-lbl">GRAND TOTAL · 2020–2026</div>
+        <div class="total-row-val">£12,400.86</div>
+      </div>
+    </div>
+
+  </div><!-- /timeline -->
+
+</div><!-- /content -->
+
+<div style="text-align:center;padding:20px 16px 44px;font-size:11px;color:rgba(60,60,67,.32);line-height:1.7;font-weight:500">
+  Cycling Investment Dashboard · Amit Kamat<br>
+  All figures confirmed via email, invoice or purchase receipt · Updated March 2026
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ── TAB SWITCHING ────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  // Re-trigger animations
+  animateBars();
+  animateVBars();
+  animateDonut();
+}
+
+// ── DATA ─────────────────────────────────────────────
+const yearData = [
+  { year:'2020', amount:2500,    color:'#007AFF' },
+  { year:'2022', amount:520,     color:'#FF2D55' },
+  { year:'2023', amount:2978,    color:'#FF9500' },
+  { year:'2024', amount:0,       color:'#34C759' },
+  { year:'2025', amount:5928.91, color:'#5856D6' },
+  { year:'2026', amount:401.97,  color:'#5AC8FA' },
+];
+
+const allItems = [
+  { label:'Cervélo Caledonia-5', sub:'Strype St · Apr 2025 · #23838279',  amount:5000,   color:'#5856D6', emoji:'🏆' },
+  { label:'Orro Gold Disc',       sub:'Elite Cycling · Aug 2020 · #2668',  amount:2500,   color:'#007AFF', emoji:'🚲' },
+  { label:'Rapha Clothing',       sub:'8 orders · Net after £577 returns', amount:1498,   color:'#FF2D55', emoji:'👕' },
+  { label:'Café du Cycliste',     sub:'3 orders · Sep–Dec 2023',           amount:1020,   color:'#FF9500', emoji:'☕' },
+  { label:'Garmin Edge 1040 + Varia', sub:'May 2023 · #104241504175',      amount:979.98, color:'#34C759', emoji:'📡' },
+  { label:'Platinum Service',     sub:'Giant St Pauls · Nov 2025',         amount:508.91, color:'#5856D6', emoji:'⚙️' },
+  { label:'Insta360 GO Ultra',    sub:'Costco · Dec 2025',                 amount:299.99, color:'#5AC8FA', emoji:'📷' },
+  { label:'Jig Bike Fit (SSC)',   sub:'Cervélo fit · Mar 2025',            amount:240,    color:'#5856D6', emoji:'📐' },
+  { label:'SSC Workshop',         sub:'Seatpost + Labour · May 2025',      amount:180,    color:'#FF9500', emoji:'🔩' },
+  { label:'Memberships',          sub:'BC Premium + Rapha RCC',            amount:147,    color:'#FF2D55', emoji:'🎫' },
+  { label:'Continental Gator ×2', sub:'Cambrian Tyres · Feb 2026',         amount:101.98, color:'#FF6B00', emoji:'🛞' },
+];
+
+const raphaOrders = [
+  { label:'Pro Team Shoes + Brevet Jersey',          amount:545 },
+  { label:'Rain Jacket + Bibs + Lightweight Jersey', amount:345 },
+  { label:'Glasses + Socks + Cap (net)',             amount:213 },
+  { label:'Overshoes + Festive Jersey',              amount:175 },
+  { label:'Helmet + Merino Gloves',                  amount:145 },
+  { label:'RCC Membership',                          amount:75  },
+];
+
+// ── BUILD ALL ITEMS LIST ─────────────────────────────
+function buildAllItems() {
+  const el = document.getElementById('all-items');
+  if (!el) return;
+  el.innerHTML = allItems.map(item => `
+    <div class="row-item">
+      <div class="row-left">
+        <div class="row-ico" style="background:${item.color}18">${item.emoji}</div>
+        <div>
+          <div class="row-title">${item.label}</div>
+          <div class="row-sub">${item.sub}</div>
+        </div>
+      </div>
+      <div class="row-right">
+        <div class="row-amt" style="color:${item.color}">£${item.amount.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── BUILD YEAR BARS (horizontal) ────────────────────
+function buildYearBars() {
+  const el = document.getElementById('year-bars');
+  if (!el) return;
+  const max = Math.max(...yearData.map(d => d.amount));
+  const labels = { '2020':'Orro Gold Disc', '2022':'Rapha clothing', '2023':'Rapha + Garmin + CdC', '2024':'Bike Fit (free)', '2025':'Cervélo + Fit + Services', '2026':'Insta360 + Tyres' };
+  el.innerHTML = yearData.map(d => `
+    <div class="bar-row">
+      <div class="bar-meta">
+        <span class="bar-name">${d.year} <span style="color:var(--label3);font-weight:400">${labels[d.year]}</span></span>
+        <span class="bar-amt" style="color:${d.color}">${d.amount > 0 ? '£' + d.amount.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—'}</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" data-pct="${(d.amount/max*100).toFixed(1)}" style="background:${d.color}"></div></div>
+    </div>`).join('');
+}
+
+// ── BUILD VERTICAL BAR CHART ─────────────────────────
+function buildVBars() {
+  const el = document.getElementById('vbar-container');
+  if (!el) return;
+  const max = Math.max(...yearData.map(d => d.amount));
+  el.innerHTML = yearData.map(d => `
+    <div class="vbar-col">
+      <div style="flex:1;display:flex;align-items:flex-end;width:100%">
+        <div class="vbar-bar" data-pct="${d.amount/max*100}" style="background:linear-gradient(180deg,${d.color} 0%,${d.color}88 100%)"></div>
+      </div>
+      <div class="vbar-yr">${d.year}</div>
+    </div>`).join('');
+}
+
+// ── BUILD RAPHA BARS ─────────────────────────────────
+function buildRaphaBars() {
+  const el = document.getElementById('rapha-bars');
+  if (!el) return;
+  const max = Math.max(...raphaOrders.map(d => d.amount));
+  el.innerHTML = raphaOrders.map((o,i) => `
+    <div class="bar-row">
+      <div class="bar-meta">
+        <span class="bar-name">${o.label}</span>
+        <span class="bar-amt" style="color:#FF2D55">${o.amount > 0 ? '£'+o.amount : 'FREE'}</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" data-pct="${(o.amount/max*100).toFixed(1)}" style="background:linear-gradient(90deg,#FF2D55,#FF6B81)"></div></div>
+    </div>`).join('');
+}
+
+// ── ANIMATE BARS ──────────────────────────────────────
+function animateBars() {
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach((bar, i) => {
+      const pct = bar.dataset.pct || 0;
+      bar.style.width = '0';
+      setTimeout(() => { bar.style.width = pct + '%'; }, i * 60);
+    });
+  }, 100);
+}
+
+// ── ANIMATE VERTICAL BARS ────────────────────────────
+function animateVBars() {
+  setTimeout(() => {
+    document.querySelectorAll('.vbar-bar').forEach((bar, i) => {
+      const pct = bar.dataset.pct || 0;
+      bar.style.height = '0';
+      setTimeout(() => { bar.style.height = pct + '%'; }, i * 80);
+    });
+  }, 150);
+}
+
+// ── ANIMATE DONUT ─────────────────────────────────────
+function animateDonut() {
+  const segs = document.querySelectorAll('.donut-seg');
+  segs.forEach(seg => {
+    const target = parseFloat(seg.dataset.target);
+    const offset = parseFloat(seg.dataset.offset);
+    const circ = 439.8; // 2 * π * 70
+    seg.style.strokeDasharray = `0 ${circ}`;
+    seg.style.strokeDashoffset = -offset;
+    seg.style.transition = 'none';
+    setTimeout(() => {
+      seg.style.transition = 'stroke-dasharray 1s cubic-bezier(.34,1.2,.64,1)';
+      seg.style.strokeDasharray = `${target} ${circ - target}`;
+      seg.style.strokeDashoffset = offset;
+    }, 200);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  buildAllItems();
+  buildYearBars();
+  buildVBars();
+  buildRaphaBars();
+  setTimeout(() => {
+    animateBars();
+    animateVBars();
+    animateDonut();
+  }, 300);
+});
+</script>
+</body>
+</html>
