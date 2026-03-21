@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DCC Weekly">
+<meta name="description" content="Desi Cycling Club — Weekly Activities">
+<title>DCC Weekly Activities</title>
+
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRENDIFdlZWtseSBBY3Rpdml0aWVzIiwic2hvcnRfbmFtZSI6IkRDQyBXZWVrbHkiLCJzdGFydF91cmwiOiIuL2FwcC5odG1sIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBhMGYxYSIsInRoZW1lX2NvbG9yIjoiIzBhMGYxYSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUIzYVdSMGFEMGlNakl3SWlCb1pXbG5hSFE5SWpJeU1DSWdkbWxsZDBKdmVEMGlNQ0l2UGc9PSIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+
+<style>
+:root {
+  --bg: #0a0f1a;
+  --card: #111827;
+  --card2: #1a2332;
+  --border: #1e2d42;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --accent: #FC4C02;
+  --teal: #14B8A6;
+  --gold: #F59E0B;
+  --silver: #94A3B8;
+  --bronze: #B45309;
+  --green: #10B981;
+  --saffron: #F59E0B;
+  --tab-h: 60px;
+  --header-h: 56px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
+
+/* ── LAYOUT ── */
+#app { display: flex; flex-direction: column; height: 100%; height: 100dvh; }
+#login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+#main { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+#tab-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--tab-h) + var(--safe-bottom) + 8px); }
+#tab-bar { display: flex; background: rgba(17,24,39,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid var(--border); height: calc(var(--tab-h) + var(--safe-bottom)); padding-bottom: var(--safe-bottom); flex-shrink: 0; }
+
+/* ── TRICOLOUR HEADER ── */
+.tricolour { height: 4px; background: linear-gradient(to right, var(--saffron) 33.3%, #fff 33.3% 66.6%, var(--green) 66.6%); }
+.page-header { background: var(--card); padding: 12px 16px 8px; position: sticky; top: 0; z-index: 10; }
+.page-header h1 { font-size: 20px; font-weight: 700; }
+.page-header .sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* ── TAB BAR ── */
+.tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: none; background: transparent; color: var(--text3); cursor: pointer; font-size: 10px; font-weight: 500; padding: 8px 4px; min-height: 44px; transition: color 0.15s; }
+.tab-btn.active { color: var(--accent); }
+.tab-btn svg { width: 22px; height: 22px; }
+
+/* ── CARDS ── */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 0 16px 12px; }
+.card-sm { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.section-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 16px 8px; }
+
+/* ── SUMMARY GRID ── */
+.summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 16px; margin-bottom: 12px; }
+.summary-grid.three { grid-template-columns: repeat(3, 1fr); }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+.stat-card .val { font-size: 22px; font-weight: 700; color: var(--text); }
+.stat-card .lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* ── LEADERBOARD ── */
+.rider-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; gap: 12px; min-height: 60px; }
+.rider-row:active { background: var(--card2); }
+.rank-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+.rank-1 { background: rgba(245,158,11,0.2); color: var(--gold); }
+.rank-2 { background: rgba(148,163,184,0.2); color: var(--silver); }
+.rank-3 { background: rgba(180,83,9,0.2); color: var(--bronze); }
+.rank-n { background: var(--card2); color: var(--text2); font-size: 12px; }
+.rider-name { font-weight: 600; font-size: 15px; flex: 1; }
+.rider-meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.rider-km { font-size: 18px; font-weight: 700; color: var(--teal); text-align: right; }
+.rider-km-lbl { font-size: 10px; color: var(--text3); text-align: right; }
+
+/* ── LOGIN ── */
+.login-logo { font-size: 56px; margin-bottom: 16px; }
+.login-title { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+.login-sub { font-size: 14px; color: var(--text2); margin-bottom: 32px; }
+.input-group { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.input-field { width: 100%; padding: 14px 16px; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 16px; outline: none; transition: border-color 0.2s; }
+.input-field:focus { border-color: var(--accent); }
+.btn-primary { width: 100%; max-width: 340px; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 17px; font-weight: 600; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+.btn-primary:active { opacity: 0.85; transform: scale(0.99); }
+.login-hint { font-size: 12px; color: var(--text3); margin-top: 12px; }
+.login-error { color: #ef4444; font-size: 13px; margin-top: 8px; min-height: 20px; text-align: center; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+.shake { animation: shake 0.4s ease; }
+
+/* ── CHARTS ── */
+.chart-container { padding: 0 16px 12px; }
+canvas { max-width: 100%; display: block; border-radius: 8px; }
+.metric-selector { display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto; scrollbar-width: none; }
+.metric-selector::-webkit-scrollbar { display: none; }
+.metric-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 13px; cursor: pointer; white-space: nowrap; transition: all 0.15s; min-height: 34px; }
+.metric-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── INSIGHTS ── */
+.insight-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 0 16px 12px; }
+.insight-icon { font-size: 28px; margin-bottom: 8px; }
+.insight-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.insight-body { font-size: 14px; color: var(--text2); line-height: 1.5; }
+.zone-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.zone-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.zone-name { font-size: 13px; font-weight: 600; flex: 1; }
+.zone-riders { font-size: 12px; color: var(--text2); }
+.confetti-card { background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 16px; margin: 0 16px 12px; position: relative; overflow: hidden; }
+.confetti-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(to right, var(--saffron), var(--accent), var(--green)); }
+
+/* ── MY STATS ── */
+.rider-picker { width: 100%; padding: 12px 16px; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 16px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 20px; padding-right: 40px; }
+.progress-bar-bg { background: var(--card2); border-radius: 4px; height: 8px; overflow: hidden; flex: 1; }
+.progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+.gap-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.gap-label { font-size: 13px; color: var(--text2); width: 90px; flex-shrink: 0; }
+.gap-val { font-size: 13px; font-weight: 600; width: 60px; text-align: right; flex-shrink: 0; }
+.whatif-card { background: var(--card2); border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+.whatif-card p { font-size: 14px; color: var(--text2); line-height: 1.5; }
+.whatif-card p strong { color: var(--text); }
+
+/* ── RIDER DETAIL PANEL ── */
+#rider-panel { position: fixed; inset: 0; background: var(--bg); z-index: 50; transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; }
+#rider-panel.open { transform: translateX(0); }
+.panel-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1; }
+.back-btn { background: var(--card2); border: none; color: var(--text); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; }
+.activity-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.activity-name { font-size: 14px; font-weight: 500; }
+.activity-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.activity-dist { font-size: 16px; font-weight: 700; color: var(--teal); }
+
+/* ── SETTINGS PANEL ── */
+#settings-panel { position: fixed; inset: 0; background: var(--bg); z-index: 50; transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; }
+#settings-panel.open { transform: translateX(0); }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.settings-row:active { background: var(--card2); }
+.settings-label { font-size: 16px; }
+.settings-value { font-size: 14px; color: var(--text2); }
+
+/* ── MISC ── */
+.medal { font-size: 16px; }
+.pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.pill-gold { background: rgba(245,158,11,0.2); color: var(--gold); }
+.pill-accent { background: rgba(252,76,2,0.2); color: var(--accent); }
+.pill-teal { background: rgba(20,184,166,0.2); color: var(--teal); }
+.pill-green { background: rgba(16,185,129,0.2); color: var(--green); }
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text3); }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 48px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-state { text-align: center; padding: 24px; }
+.timestamp { font-size: 12px; color: var(--text3); padding: 8px 16px; }
+.divider { height: 1px; background: var(--border); margin: 0 16px; }
+.radar-wrap { position: relative; margin: 0 16px 16px; }
+.tooltip { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 12px; position: absolute; pointer-events: none; z-index: 20; }
+a { color: var(--teal); text-decoration: none; }
+
+/* ── RESPONSIVE ── */
+@media (min-width: 768px) {
+  #tab-content { max-width: 900px; margin: 0 auto; }
+  .summary-grid { grid-template-columns: repeat(4, 1fr); }
+  #tab-bar { max-width: 900px; left: 50%; transform: translateX(-50%); position: fixed; bottom: 0; width: 100%; }
+  #tab-content { padding-bottom: calc(var(--tab-h) + 24px); }
+}
+@media (min-width: 1024px) {
+  body { overflow: auto; }
+  #app { height: auto; }
+  #tab-content { overflow: visible; padding-bottom: 80px; }
+  #tab-bar { max-width: 640px; border-radius: 16px 16px 0 0; border: 1px solid var(--border); border-bottom: none; }
+  .summary-grid { grid-template-columns: repeat(5, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-logo">🚴</div>
+  <div class="login-title">DCC Weekly</div>
+  <div class="login-sub">Desi Cycling Club</div>
+  <div class="input-group" id="login-fields">
+    <input class="input-field" id="login-name" type="text" placeholder="Your name" autocomplete="name" autocorrect="off">
+    <input class="input-field" id="login-code" type="text" placeholder="Club code (e.g. DCC2026)" autocomplete="off" autocorrect="off" style="text-transform:uppercase">
+  </div>
+  <div class="login-error" id="login-error"></div>
+  <button class="btn-primary" id="login-btn" onclick="doLogin()">Join DCC</button>
+  <div class="login-hint">Ask your DCC admin for the club code</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main" style="display:none">
+  <!-- Tab Content -->
+  <div id="tab-content">
+    <div id="tab-overview"></div>
+    <div id="tab-leaderboard" style="display:none"></div>
+    <div id="tab-charts" style="display:none"></div>
+    <div id="tab-insights" style="display:none"></div>
+    <div id="tab-mystats" style="display:none"></div>
+  </div>
+
+  <!-- Tab Bar -->
+  <nav id="tab-bar">
+    <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Overview
+    </button>
+    <button class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
+      Leaderboard
+    </button>
+    <button class="tab-btn" data-tab="charts" onclick="switchTab('charts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><rect x="2" y="2" width="20" height="20" rx="2" ry="2"/></svg>
+      Charts
+    </button>
+    <button class="tab-btn" data-tab="insights" onclick="switchTab('insights')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Insights
+    </button>
+    <button class="tab-btn" data-tab="mystats" onclick="switchTab('mystats')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      My Stats
+    </button>
+  </nav>
+</div>
+
+<!-- RIDER DETAIL PANEL -->
+<div id="rider-panel">
+  <div class="panel-header">
+    <button class="back-btn" onclick="closeRiderPanel()">←</button>
+    <div>
+      <div id="rider-panel-name" style="font-size:18px;font-weight:700"></div>
+      <div id="rider-panel-sub" style="font-size:12px;color:var(--text2)"></div>
+    </div>
+  </div>
+  <div id="rider-panel-content"></div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div id="settings-panel">
+  <div class="panel-header">
+    <button class="back-btn" onclick="closeSettings()">←</button>
+    <div style="font-size:18px;font-weight:700">Settings</div>
+  </div>
+  <div id="settings-content"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+const VALID_CODES = ['DCC2026', 'DESI2026'];
+const API_URL = 'https://dcc-strava.amit-r-kamat.workers.dev/club-data';
+const CACHE_KEY = 'dcc_club_data';
+const AUTH_KEY = 'dcc_auth';
+const MEMBER_KEY = 'dcc_member';
+
+let appData = null;
+let currentTab = 'overview';
+let chartMetric = 'distance';
+let myRider = null;
+let chartAnimFrame = null;
+
+// ══════════════════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════════════════
+function doLogin() {
+  const name = document.getElementById('login-name').value.trim();
+  const code = document.getElementById('login-code').value.trim().toUpperCase();
+  const err = document.getElementById('login-error');
+  const fields = document.getElementById('login-fields');
+
+  if (!name) { showLoginError('Please enter your name.', fields); return; }
+  if (!VALID_CODES.includes(code)) { showLoginError('Invalid club code. Contact your DCC admin.', fields); return; }
+
+  localStorage.setItem(AUTH_KEY, code);
+  localStorage.setItem(MEMBER_KEY, name);
+  err.textContent = '';
+  startApp();
+}
+
+function showLoginError(msg, el) {
+  document.getElementById('login-error').textContent = msg;
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+}
+
+document.getElementById('login-code').addEventListener('input', function() {
+  this.value = this.value.toUpperCase();
+});
+document.getElementById('login-code').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('login-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('login-code').focus(); });
+
+// ══════════════════════════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem(AUTH_KEY)) {
+    startApp();
+  }
+  registerSW();
+});
+
+function startApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main').style.display = 'flex';
+  myRider = localStorage.getItem(MEMBER_KEY) || null;
+  loadData();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════
+async function loadData(force = false) {
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (cached && !force) {
+    try {
+      appData = JSON.parse(cached);
+      renderCurrentTab();
+    } catch(e) {}
+  }
+
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    appData = json;
+    appData.members = appData.members.sort((a, b) => b.totalDistance - a.totalDistance);
+    localStorage.setItem(CACHE_KEY, JSON.stringify(appData));
+    renderCurrentTab();
+  } catch(e) {
+    if (!appData) showOfflineState();
+  }
+}
+
+function showOfflineState() {
+  document.getElementById('tab-overview').innerHTML = `<div class="empty-state"><div class="icon">📡</div><div>No connection. Showing cached data.</div></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════════════
+const TABS = ['overview','leaderboard','charts','insights','mystats'];
+
+function switchTab(tab) {
+  currentTab = tab;
+  TABS.forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === tab ? '' : 'none';
+    document.querySelector(`[data-tab="${t}"]`).classList.toggle('active', t === tab);
+  });
+  document.getElementById('tab-content').scrollTop = 0;
+  renderCurrentTab();
+}
+
+function renderCurrentTab() {
+  if (!appData) return;
+  switch(currentTab) {
+    case 'overview': renderOverview(); break;
+    case 'leaderboard': renderLeaderboard(); break;
+    case 'charts': renderCharts(); break;
+    case 'insights': renderInsights(); break;
+    case 'mystats': renderMyStats(); break;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════
+function fmtKm(d) { return (d||0).toFixed(1) + ' km'; }
+function fmtTime(secs) {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+function fmtSpeed(s) { return (s||0).toFixed(1) + ' km/h'; }
+function fmtElev(e) { return (e||0).toLocaleString() + 'm'; }
+function ago(dateStr) {
+  if (!dateStr) return 'recently';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const h = Math.floor(diff / 3600000);
+  if (h < 1) return 'just now';
+  if (h < 24) return h + 'h ago';
+  return Math.floor(h/24) + 'd ago';
+}
+function weekRange() {
+  const now = new Date();
+  const day = now.getDay();
+  const mon = new Date(now); mon.setDate(now.getDate() - ((day + 6) % 7));
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const fmt = d => d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+  return `${fmt(mon)} – ${fmt(sun)}`;
+}
+function medalEmoji(i) { return ['🥇','🥈','🥉'][i] || (i+1)+''; }
+function rankBadge(i) {
+  const cls = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
+  return `<div class="rank-badge ${cls}">${medalEmoji(i)}</div>`;
+}
+function getZone(member) {
+  const s = member.avgSpeed || 0;
+  const d = member.totalDistance || 0;
+  if (s >= 30 && d >= 300) return {z:5, label:'Zone 5 – Elite', color:'#ef4444'};
+  if (s >= 25 && d >= 200) return {z:4, label:'Zone 4 – Strong', color:'#f97316'};
+  if (s >= 20 && d >= 100) return {z:3, label:'Zone 3 – Solid', color:'#eab308'};
+  if (s >= 15 && d >= 50)  return {z:2, label:'Zone 2 – Building', color:'#22c55e'};
+  return {z:1, label:'Zone 1 – Starting', color:'#3b82f6'};
+}
+
+// ══════════════════════════════════════════════════════════════════
+// OVERVIEW TAB
+// ══════════════════════════════════════════════════════════════════
+function renderOverview() {
+  const d = appData;
+  const m = d.members;
+  const totalKm = m.reduce((s,r)=>s+r.totalDistance,0);
+  const totalRides = m.reduce((s,r)=>s+r.rideCount,0);
+  const totalElev = m.reduce((s,r)=>s+r.totalElevation,0);
+  const avgSpeed = m.reduce((s,r)=>s+(r.avgSpeed*r.rideCount),0) / Math.max(totalRides,1);
+
+  // Recent activities across all riders, sorted by none (as they come)
+  const allActivities = [];
+  m.forEach(rider => {
+    (rider.activities||[]).forEach(a => allActivities.push({...a, rider: rider.name}));
+  });
+  const recent = allActivities.slice(0,8);
+
+  document.getElementById('tab-overview').innerHTML = `
+    <div class="tricolour"></div>
+    <div class="page-header">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <h1>🚴 DCC Weekly</h1>
+          <div class="sub">${weekRange()} · Updated ${ago(d.lastFetchedAt)}</div>
+        </div>
+        <button onclick="openSettings()" style="background:var(--card2);border:none;color:var(--text2);padding:8px;border-radius:8px;cursor:pointer;font-size:18px">⚙️</button>
+      </div>
+    </div>
+
+    <div class="summary-grid" style="margin-top:16px">
+      <div class="stat-card"><div class="val">${m.length}</div><div class="lbl">Riders</div></div>
+      <div class="stat-card"><div class="val" style="color:var(--teal)">${totalKm.toFixed(0)}</div><div class="lbl">Total KM</div></div>
+      <div class="stat-card"><div class="val">${totalRides}</div><div class="lbl">Rides</div></div>
+      <div class="stat-card"><div class="val" style="color:var(--green)">${fmtElev(totalElev)}</div><div class="lbl">Elevation</div></div>
+    </div>
+    <div class="stat-card" style="margin:0 16px 16px;text-align:center">
+      <div class="val" style="color:var(--accent)">${avgSpeed.toFixed(1)} km/h</div>
+      <div class="lbl">Club Average Speed</div>
+    </div>
+
+    <div class="section-title">🏆 Top 3 This Week</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      ${m.slice(0,3).map((r,i)=>`
+        <div class="rider-row" onclick="openRiderPanel(${i})">
+          ${rankBadge(i)}
+          <div style="flex:1">
+            <div class="rider-name">${r.name}</div>
+            <div class="rider-meta">${r.rideCount} rides · ${fmtSpeed(r.avgSpeed)} avg</div>
+          </div>
+          <div>
+            <div class="rider-km">${r.totalDistance.toFixed(1)}</div>
+            <div class="rider-km-lbl">km</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="section-title">🕐 Recent Rides</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      ${recent.map(a=>`
+        <div class="activity-row">
+          <div>
+            <div class="activity-name">${a.name}</div>
+            <div class="activity-meta">${a.rider} · ${fmtTime(a.movingTime)} · ${fmtElev(a.elevationGain)} ↗</div>
+          </div>
+          <div style="text-align:right">
+            <div class="activity-dist">${a.distance.toFixed(1)}</div>
+            <div style="font-size:10px;color:var(--text3)">km</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div style="height:8px"></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// LEADERBOARD TAB
+// ══════════════════════════════════════════════════════════════════
+function renderLeaderboard() {
+  const m = appData.members;
+  document.getElementById('tab-leaderboard').innerHTML = `
+    <div class="tricolour"></div>
+    <div class="page-header">
+      <h1>🏆 Leaderboard</h1>
+      <div class="sub">${weekRange()} · ${m.length} riders</div>
+    </div>
+    <div style="background:var(--card);border-bottom:1px solid var(--border)">
+      ${m.map((r,i)=>`
+        <div class="rider-row" onclick="openRiderPanel(${i})">
+          ${rankBadge(i)}
+          <div style="flex:1">
+            <div class="rider-name">${r.name}</div>
+            <div class="rider-meta">${r.rideCount} rides · ${fmtSpeed(r.avgSpeed)} · ${fmtElev(r.totalElevation)} ↗</div>
+          </div>
+          <div>
+            <div class="rider-km">${r.totalDistance.toFixed(1)}</div>
+            <div class="rider-km-lbl">km</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div style="height:8px"></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RIDER DETAIL PANEL
+// ══════════════════════════════════════════════════════════════════
+function openRiderPanel(idx) {
+  const m = appData.members;
+  const r = m[idx];
+  const leader = m[0];
+  const zone = getZone(r);
+
+  document.getElementById('rider-panel-name').textContent = r.name;
+  document.getElementById('rider-panel-sub').textContent = `Rank #${idx+1} of ${m.length} · ${zone.label}`;
+
+  const gapToLeader = idx === 0 ? 0 : leader.totalDistance - r.totalDistance;
+
+  document.getElementById('rider-panel-content').innerHTML = `
+    <div class="tricolour"></div>
+    <div class="summary-grid" style="margin-top:16px">
+      <div class="stat-card"><div class="val" style="color:var(--teal)">${r.totalDistance.toFixed(1)}</div><div class="lbl">km</div></div>
+      <div class="stat-card"><div class="val">${r.rideCount}</div><div class="lbl">Rides</div></div>
+      <div class="stat-card"><div class="val" style="color:var(--accent)">${fmtSpeed(r.avgSpeed)}</div><div class="lbl">Avg Speed</div></div>
+      <div class="stat-card"><div class="val" style="color:var(--green)">${fmtElev(r.totalElevation)}</div><div class="lbl">Elevation</div></div>
+    </div>
+
+    <div class="section-title">Performance</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:12px;height:12px;border-radius:50%;background:${zone.color}"></div>
+        <div style="font-weight:600">${zone.label}</div>
+      </div>
+      ${idx > 0 ? `<div style="font-size:13px;color:var(--text2)">Gap to leader: <strong style="color:var(--text)">${gapToLeader.toFixed(1)} km behind ${leader.name}</strong></div>` : '<div style="font-size:13px;color:var(--gold)">🥇 Current leader</div>'}
+      <div style="font-size:13px;color:var(--text2);margin-top:6px">Moving time: <strong style="color:var(--text)">${r.movingTimeFormatted || fmtTime(r.totalMovingTime)}</strong></div>
+    </div>
+
+    <div class="section-title">Rides (${(r.activities||[]).length})</div>
+    <div style="background:var(--card);border-bottom:1px solid var(--border)">
+      ${(r.activities||[]).length === 0
+        ? '<div class="empty-state"><div>No activity details available</div></div>'
+        : (r.activities||[]).map(a=>`
+          <div class="activity-row">
+            <div>
+              <div class="activity-name">${a.name}</div>
+              <div class="activity-meta">${fmtTime(a.movingTime)} · ${fmtElev(a.elevationGain)} ↗ · ${fmtSpeed(a.averageSpeed)}</div>
+            </div>
+            <div style="text-align:right">
+              <div class="activity-dist">${a.distance.toFixed(1)}</div>
+              <div style="font-size:10px;color:var(--text3)">km</div>
+            </div>
+          </div>`).join('')}
+    </div>
+    <div style="height:32px"></div>
+  `;
+
+  document.getElementById('rider-panel').classList.add('open');
+}
+
+function closeRiderPanel() {
+  document.getElementById('rider-panel').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CHARTS TAB
+// ══════════════════════════════════════════════════════════════════
+function renderCharts() {
+  document.getElementById('tab-charts').innerHTML = `
+    <div class="tricolour"></div>
+    <div class="page-header"><h1>📊 Charts</h1><div class="sub">Club performance analysis</div></div>
+    <div class="metric-selector">
+      <button class="metric-btn active" onclick="setMetric('distance',this)">Distance</button>
+      <button class="metric-btn" onclick="setMetric('speed',this)">Speed</button>
+      <button class="metric-btn" onclick="setMetric('elevation',this)">Elevation</button>
+      <button class="metric-btn" onclick="setMetric('rides',this)">Rides</button>
+    </div>
+    <div class="section-title">Member Comparison</div>
+    <div class="chart-container"><canvas id="bar-chart"></canvas></div>
+    <div class="section-title">Radar — Distance vs Speed vs Elevation</div>
+    <div id="radar-select" style="padding:0 16px 8px">
+      <select class="rider-picker" id="radar-rider-a" onchange="drawRadar()">
+        ${appData.members.map((r,i)=>`<option value="${i}">${r.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="radar-wrap"><canvas id="radar-chart"></canvas></div>
+    <div class="section-title">Distance vs Speed Distribution</div>
+    <div class="chart-container"><canvas id="scatter-chart"></canvas></div>
+    <div style="height:8px"></div>
+  `;
+  drawBarChart();
+  drawRadar();
+  drawScatter();
+}
+
+function setMetric(metric, btn) {
+  chartMetric = metric;
+  document.querySelectorAll('.metric-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  drawBarChart();
+}
+
+function getMetricVal(r) {
+  switch(chartMetric) {
+    case 'distance': return r.totalDistance;
+    case 'speed': return r.avgSpeed;
+    case 'elevation': return r.totalElevation;
+    case 'rides': return r.rideCount;
+  }
+  return 0;
+}
+function getMetricLabel() {
+  return {distance:'km',speed:'km/h',elevation:'m',rides:'rides'}[chartMetric];
+}
+
+function drawBarChart() {
+  const canvas = document.getElementById('bar-chart');
+  if (!canvas) return;
+  const members = [...appData.members].sort((a,b) => getMetricVal(b) - getMetricVal(a));
+  const barH = 36, gap = 8, labelW = 90, valW = 50, padV = 12;
+  const totalH = members.length * (barH + gap) + padV * 2;
+  canvas.width = canvas.offsetWidth || canvas.parentElement.offsetWidth;
+  canvas.height = totalH;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  ctx.clearRect(0, 0, W, totalH);
+
+  const maxVal = Math.max(...members.map(getMetricVal)) || 1;
+  const barAreaW = W - labelW - valW - 16;
+
+  let targets = members.map((r,i) => ({
+    r, i,
+    target: (getMetricVal(r) / maxVal) * barAreaW,
+    current: 0
+  }));
+
+  if (chartAnimFrame) cancelAnimationFrame(chartAnimFrame);
+  const start = performance.now();
+  const dur = 800;
+
+  function draw(ts) {
+    const prog = Math.min((ts - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - prog, 3);
+    ctx.clearRect(0, 0, W, totalH);
+    canvas.style.background = 'var(--card)';
+
+    targets.forEach(({r, i, target}) => {
+      const y = padV + i * (barH + gap);
+      const w = target * ease;
+
+      // Name
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '13px -apple-system, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      const name = r.name.length > 11 ? r.name.slice(0,10)+'…' : r.name;
+      ctx.fillText(name, 8, y + barH/2);
+
+      // Bar
+      const barX = labelW;
+      const color = i===0 ? '#F59E0B' : i<3 ? '#FC4C02' : '#14B8A6';
+      ctx.fillStyle = color + '33';
+      roundRect(ctx, barX, y, barAreaW, barH, 6);
+      ctx.fill();
+      if (w > 0) {
+        ctx.fillStyle = color;
+        roundRect(ctx, barX, y, w, barH, 6);
+        ctx.fill();
+      }
+
+      // Value
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = 'bold 13px -apple-system, sans-serif';
+      ctx.textAlign = 'right';
+      const val = getMetricVal(r);
+      const disp = chartMetric === 'distance' ? val.toFixed(1) : chartMetric === 'speed' ? val.toFixed(1) : Math.round(val).toString();
+      ctx.fillText(disp, W - 4, y + barH/2);
+    });
+
+    if (prog < 1) chartAnimFrame = requestAnimationFrame(draw);
+  }
+  chartAnimFrame = requestAnimationFrame(draw);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function drawRadar() {
+  const canvas = document.getElementById('radar-chart');
+  if (!canvas) return;
+  const W = canvas.offsetWidth || canvas.parentElement.offsetWidth;
+  canvas.width = W; canvas.height = W;
+  const ctx = canvas.getContext('2d');
+  const cx = W/2, cy = W/2, R = W/2 - 40;
+  const axes = ['Distance','Speed','Elevation','Rides','Mov.Time'];
+  const n = axes.length;
+  const members = appData.members;
+  const leader = members[0];
+  const selIdx = parseInt(document.getElementById('radar-rider-a')?.value || '0');
+  const sel = members[selIdx] || leader;
+
+  const maxes = [
+    Math.max(...members.map(r=>r.totalDistance)),
+    Math.max(...members.map(r=>r.avgSpeed)),
+    Math.max(...members.map(r=>r.totalElevation)),
+    Math.max(...members.map(r=>r.rideCount)),
+    Math.max(...members.map(r=>r.totalMovingTime)),
+  ];
+
+  function vals(r) {
+    return [r.totalDistance, r.avgSpeed, r.totalElevation, r.rideCount, r.totalMovingTime]
+      .map((v,i) => v / (maxes[i]||1));
+  }
+
+  ctx.clearRect(0,0,W,W);
+
+  // Grid rings
+  [0.2,0.4,0.6,0.8,1].forEach(f => {
+    ctx.beginPath();
+    for (let i=0;i<n;i++) {
+      const a = (i/n)*Math.PI*2 - Math.PI/2;
+      const x = cx + R*f*Math.cos(a), y = cy + R*f*Math.sin(a);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = '#1e2d42';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Axes
+  for (let i=0;i<n;i++) {
+    const a = (i/n)*Math.PI*2 - Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + R*Math.cos(a), cy + R*Math.sin(a));
+    ctx.strokeStyle = '#1e2d42';
+    ctx.stroke();
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(axes[i], cx + (R+18)*Math.cos(a), cy + (R+18)*Math.sin(a));
+  }
+
+  function polygon(vArr, color, fill) {
+    ctx.beginPath();
+    vArr.forEach((v,i) => {
+      const a = (i/n)*Math.PI*2 - Math.PI/2;
+      const x = cx + R*v*Math.cos(a), y = cy + R*v*Math.sin(a);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  polygon(vals(leader), '#F59E0B', 'rgba(245,158,11,0.15)');
+  if (sel !== leader) polygon(vals(sel), '#FC4C02', 'rgba(252,76,2,0.15)');
+
+  // Legend
+  ctx.fillStyle = '#F59E0B'; ctx.fillRect(cx-60, W-22, 12, 12);
+  ctx.fillStyle = '#e2e8f0'; ctx.font = '11px -apple-system, sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText(leader.name, cx-44, W-16);
+  if (sel !== leader) {
+    ctx.fillStyle = '#FC4C02'; ctx.fillRect(cx+20, W-22, 12, 12);
+    ctx.fillStyle = '#e2e8f0'; ctx.fillText(sel.name, cx+36, W-16);
+  }
+}
+
+function drawScatter() {
+  const canvas = document.getElementById('scatter-chart');
+  if (!canvas) return;
+  const W = canvas.offsetWidth || canvas.parentElement.offsetWidth;
+  const H = 220;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const pad = {l:40, r:16, t:16, b:36};
+  const pW = W - pad.l - pad.r, pH = H - pad.t - pad.b;
+  const members = appData.members;
+  const maxD = Math.max(...members.map(r=>r.totalDistance)) || 1;
+  const maxS = Math.max(...members.map(r=>r.avgSpeed)) || 1;
+  const minS = Math.min(...members.map(r=>r.avgSpeed));
+
+  ctx.clearRect(0,0,W,H);
+
+  // Axes
+  ctx.strokeStyle = '#1e2d42'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+pH); ctx.lineTo(pad.l+pW,pad.t+pH); ctx.stroke();
+
+  ctx.fillStyle = '#64748b'; ctx.font = '10px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Distance (km)', pad.l + pW/2, H-4);
+  ctx.save(); ctx.translate(12, pad.t+pH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('Speed (km/h)', 0, 0); ctx.restore();
+
+  members.forEach((r,i) => {
+    const x = pad.l + (r.totalDistance / maxD) * pW;
+    const y = pad.t + pH - ((r.avgSpeed - minS) / (maxS - minS || 1)) * pH;
+    const color = i===0?'#F59E0B':i<3?'#FC4C02':'#14B8A6';
+    ctx.beginPath();
+    ctx.arc(x, y, 7, 0, Math.PI*2);
+    ctx.fillStyle = color + 'aa';
+    ctx.fill();
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 9px -apple-system,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText((i+1), x, y);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INSIGHTS TAB
+// ══════════════════════════════════════════════════════════════════
+function renderInsights() {
+  const m = appData.members;
+  const totalKm = m.reduce((s,r)=>s+r.totalDistance,0);
+  const totalRides = m.reduce((s,r)=>s+r.rideCount,0);
+  const totalElev = m.reduce((s,r)=>s+r.totalElevation,0);
+  const avgSpeed = m.reduce((s,r)=>s+(r.avgSpeed*r.rideCount),0) / Math.max(totalRides,1);
+  const leader = m[0];
+
+  const mostRides = [...m].sort((a,b)=>b.rideCount-a.rideCount)[0];
+  const fastest = [...m].sort((a,b)=>b.avgSpeed-a.avgSpeed)[0];
+  const mostElev = [...m].sort((a,b)=>b.totalElevation-a.totalElevation)[0];
+
+  // Coaching tips
+  const tips = [];
+  tips.push({ icon:'🏆', title:'Leader Spotlight', body:`${leader.name} is leading with ${leader.totalDistance.toFixed(1)} km across ${leader.rideCount} rides this week.` });
+  tips.push({ icon:'⚡', title:'Speed Demon', body:`${fastest.name} has the highest average speed at ${fastest.avgSpeed.toFixed(1)} km/h — ${(fastest.avgSpeed - avgSpeed).toFixed(1)} km/h faster than the club average.` });
+  tips.push({ icon:'🔁', title:'Consistency King', body:`${mostRides.name} leads with ${mostRides.rideCount} rides — that's ${mostRides.rideCount > 7 ? 'riding almost every day' : 'great consistency'}!` });
+  tips.push({ icon:'⛰️', title:'Mountain Goat', body:`${mostElev.name} has climbed ${mostElev.totalElevation.toLocaleString()}m — the most elevation in the club this week!` });
+  tips.push({ icon:'🌍', title:'Club Achievement', body:`Together you've covered ${totalKm.toFixed(0)} km and climbed ${totalElev.toLocaleString()}m — that's ${(totalElev/8849*100).toFixed(0)}% of Everest!` });
+  if (totalRides > 0) tips.push({ icon:'📈', title:'Ride Stats', body:`The club averaged ${(totalKm/totalRides).toFixed(1)} km per ride and ${fmtTime(Math.round(m.reduce((s,r)=>s+r.totalMovingTime,0)/totalRides))} of moving time per ride.` });
+
+  // Celebration cards
+  const celebrations = [
+    { icon:'🥇', title:'Most KM', name: leader.name, val: leader.totalDistance.toFixed(1) + ' km', color: '#F59E0B' },
+    { icon:'⚡', title:'Fastest', name: fastest.name, val: fastest.avgSpeed.toFixed(1) + ' km/h', color: '#FC4C02' },
+    { icon:'🔁', title:'Most Rides', name: mostRides.name, val: mostRides.rideCount + ' rides', color: '#14B8A6' },
+    { icon:'⛰️', title:'Most Elevation', name: mostElev.name, val: mostElev.totalElevation.toLocaleString() + 'm', color: '#10B981' },
+  ];
+
+  // Zones
+  const zoneGroups = {};
+  m.forEach(r => {
+    const z = getZone(r);
+    if (!zoneGroups[z.z]) zoneGroups[z.z] = {label:z.label, color:z.color, riders:[]};
+    zoneGroups[z.z].riders.push(r.name);
+  });
+
+  document.getElementById('tab-insights').innerHTML = `
+    <div class="tricolour"></div>
+    <div class="page-header"><h1>💡 Insights</h1><div class="sub">AI-powered club analysis</div></div>
+
+    <div class="section-title">🎉 Champions This Week</div>
+    ${celebrations.map(c=>`
+      <div class="confetti-card" style="border-color:${c.color}33">
+        <div style="font-size:28px;margin-bottom:6px">${c.icon}</div>
+        <div style="font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${c.title}</div>
+        <div style="font-size:20px;font-weight:700;margin:4px 0">${c.name}</div>
+        <div style="font-size:16px;font-weight:600;color:${c.color}">${c.val}</div>
+      </div>`).join('')}
+
+    <div class="section-title">🧠 Coaching Tips</div>
+    ${tips.map(t=>`
+      <div class="insight-card">
+        <div class="insight-icon">${t.icon}</div>
+        <div class="insight-title">${t.title}</div>
+        <div class="insight-body">${t.body}</div>
+      </div>`).join('')}
+
+    <div class="section-title">🎯 Performance Zones</div>
+    <div class="card">
+      ${[5,4,3,2,1].filter(z=>zoneGroups[z]).map(z=>{
+        const g = zoneGroups[z];
+        return `<div class="zone-row">
+          <div class="zone-dot" style="background:${g.color}"></div>
+          <div class="zone-name">${g.label}</div>
+          <div class="zone-riders">${g.riders.join(', ')}</div>
+        </div>`;
+      }).join('')}
+      ${[5,4,3,2,1].every(z=>!zoneGroups[z]) ? '<div style="color:var(--text3);font-size:13px">No zone data</div>' : ''}
+    </div>
+    <div style="height:8px"></div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MY STATS TAB
+// ══════════════════════════════════════════════════════════════════
+function renderMyStats() {
+  const m = appData.members;
+  const savedName = localStorage.getItem(MEMBER_KEY) || '';
+
+  document.getElementById('tab-mystats').innerHTML = `
+    <div class="tricolour"></div>
+    <div class="page-header"><h1>👤 My Stats</h1><div class="sub">Personal performance analysis</div></div>
+    <div style="padding:12px 16px">
+      <select class="rider-picker" id="my-rider-select" onchange="updateMyStats()">
+        <option value="">— Select your name —</option>
+        ${m.map((r,i)=>`<option value="${i}" ${r.name===savedName?'selected':''}>${r.name}</option>`).join('')}
+      </select>
+    </div>
+    <div id="my-stats-content"></div>
+  `;
+  updateMyStats();
+}
+
+function updateMyStats() {
+  const sel = document.getElementById('my-rider-select');
+  if (!sel) return;
+  const idx = sel.value === '' ? -1 : parseInt(sel.value);
+  const content = document.getElementById('my-stats-content');
+  if (idx < 0) {
+    content.innerHTML = '<div class="empty-state"><div class="icon">👆</div><div>Select your name above to see your personal stats</div></div>';
+    return;
+  }
+
+  const m = appData.members;
+  const r = m[idx];
+  const leader = m[0];
+  const zone = getZone(r);
+  const totalRides = m.reduce((s,x)=>s+x.rideCount,0);
+  const avgClubSpeed = m.reduce((s,x)=>s+(x.avgSpeed*x.rideCount),0) / Math.max(totalRides,1);
+
+  // What-if
+  const riderAbove = idx > 0 ? m[idx-1] : null;
+  const kmNeeded = riderAbove ? (riderAbove.totalDistance - r.totalDistance) : 0;
+  const avgRideKm = r.rideCount > 0 ? r.totalDistance / r.rideCount : 0;
+  const ridesNeeded = avgRideKm > 0 ? Math.ceil(kmNeeded / avgRideKm) : 0;
+
+  // Gap metrics
+  const metrics = [
+    { label: 'Distance', myVal: r.totalDistance, topVal: leader.totalDistance, unit: 'km', fmt: v=>v.toFixed(1) },
+    { label: 'Speed', myVal: r.avgSpeed, topVal: leader.avgSpeed, unit: 'km/h', fmt: v=>v.toFixed(1) },
+    { label: 'Elevation', myVal: r.totalElevation, topVal: leader.totalElevation, unit: 'm', fmt: v=>Math.round(v) },
+    { label: 'Rides', myVal: r.rideCount, topVal: leader.rideCount, unit: '', fmt: v=>v },
+  ];
+
+  // Worst metric
+  const ratios = metrics.map(met => ({ label: met.label, ratio: met.myVal / (met.topVal||1) }));
+  const worst = [...ratios].sort((a,b)=>a.ratio-b.ratio)[0];
+
+  content.innerHTML = `
+    <div class="summary-grid" style="margin-bottom:12px">
+      <div class="stat-card"><div class="val">#${idx+1}</div><div class="lbl">Rank</div></div>
+      <div class="stat-card"><div class="val" style="color:var(--teal)">${r.totalDistance.toFixed(1)}</div><div class="lbl">km</div></div>
+      <div class="stat-card"><div class="val">${r.rideCount}</div><div class="lbl">Rides</div></div>
+      <div class="stat-card"><div class="val" style="color:var(--accent)">${r.avgSpeed.toFixed(1)}</div><div class="lbl">km/h</div></div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${zone.color}"></div>
+        <div style="font-weight:600;font-size:14px">${zone.label}</div>
+        <div style="margin-left:auto;font-size:12px;color:var(--text2)">${fmtTime(r.totalMovingTime)} moving</div>
+      </div>
+      ${r.avgSpeed > avgClubSpeed
+        ? `<div style="margin-top:8px;font-size:13px;color:var(--green)">✅ ${(r.avgSpeed - avgClubSpeed).toFixed(1)} km/h faster than club average</div>`
+        : `<div style="margin-top:8px;font-size:13px;color:var(--text2)">📊 ${(avgClubSpeed - r.avgSpeed).toFixed(1)} km/h below club average</div>`}
+    </div>
+
+    <div class="section-title">🎯 Gap to Leader (${leader.name})</div>
+    <div class="card">
+      ${metrics.map(met => {
+        const pct = Math.min(met.myVal / (met.topVal||1) * 100, 100);
+        const color = pct > 80 ? 'var(--green)' : pct > 50 ? 'var(--teal)' : 'var(--accent)';
+        return `<div class="gap-row">
+          <div class="gap-label">${met.label}</div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%;background:${color}" data-w="${pct}"></div></div>
+          <div class="gap-val" style="color:${color}">${met.fmt(met.myVal)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${riderAbove ? `
+    <div class="section-title">💡 What-If Engine</div>
+    <div class="card" style="display:flex;flex-direction:column;gap:8px">
+      <div class="whatif-card"><p>🚀 You need <strong>${kmNeeded.toFixed(1)} km</strong> more to overtake <strong>${riderAbove.name}</strong> (rank #${idx})</p></div>
+      <div class="whatif-card"><p>🔁 At your average of <strong>${avgRideKm.toFixed(1)} km/ride</strong>, that's roughly <strong>${ridesNeeded} more ride${ridesNeeded!==1?'s':''}</strong></p></div>
+      <div class="whatif-card"><p>📅 Keep your current pace and you'll finish the month with approximately <strong>${(r.totalDistance * 4.3).toFixed(0)} km</strong></p></div>
+    </div>` : `
+    <div class="card" style="text-align:center;padding:20px">
+      <div style="font-size:24px;margin-bottom:8px">🥇</div>
+      <div style="font-weight:700">You're the leader!</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">Keep pushing — ${m[1]?.name || 'the pack'} is ${(r.totalDistance - (m[1]?.totalDistance||0)).toFixed(1)} km behind.</div>
+    </div>`}
+
+    <div class="section-title">⚠️ Weakest Area</div>
+    <div class="card">
+      <div style="font-size:14px;color:var(--text2)">Your weakest metric relative to the leader is <strong style="color:var(--text)">${worst.label}</strong> at ${(worst.ratio*100).toFixed(0)}% of the leader's level.</div>
+      ${worst.label==='Elevation' ? '<div style="margin-top:8px;font-size:13px;color:var(--text2)">💡 Try adding a hilly route to your next ride.</div>' : ''}
+      ${worst.label==='Speed' ? '<div style="margin-top:8px;font-size:13px;color:var(--text2)">💡 Try some interval training to boost your average speed.</div>' : ''}
+      ${worst.label==='Rides' ? '<div style="margin-top:8px;font-size:13px;color:var(--text2)">💡 Add a short recovery ride to your weekly routine.</div>' : ''}
+    </div>
+
+    <div class="section-title">🆚 Me vs Top 3</div>
+    <div class="card" style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="color:var(--text2)">
+            <th style="text-align:left;padding:6px 0;font-weight:500">Rider</th>
+            <th style="text-align:right;padding:6px 4px;font-weight:500">KM</th>
+            <th style="text-align:right;padding:6px 4px;font-weight:500">Rides</th>
+            <th style="text-align:right;padding:6px 4px;font-weight:500">Speed</th>
+            <th style="text-align:right;padding:6px 0;font-weight:500">Elev</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${[...m.slice(0,3), r].filter((x,i,arr)=>arr.indexOf(x)===i).map((x,i)=>{
+            const isMe = x === r;
+            return `<tr style="${isMe?'color:var(--accent);font-weight:600':'color:var(--text)'}">
+              <td style="padding:7px 0">${isMe?'👤 ':''} ${x.name.split(' ')[0]}</td>
+              <td style="text-align:right;padding:7px 4px">${x.totalDistance.toFixed(1)}</td>
+              <td style="text-align:right;padding:7px 4px">${x.rideCount}</td>
+              <td style="text-align:right;padding:7px 4px">${x.avgSpeed.toFixed(1)}</td>
+              <td style="text-align:right;padding:7px 0">${Math.round(x.totalElevation/100)/10}k</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="height:8px"></div>
+  `;
+
+  // Animate progress bars
+  setTimeout(() => {
+    document.querySelectorAll('.progress-bar-fill').forEach(el => {
+      el.style.width = '0%';
+      setTimeout(() => { el.style.width = el.dataset.w + '%'; }, 50);
+    });
+  }, 50);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════════════════════
+function openSettings() {
+  const code = localStorage.getItem(AUTH_KEY) || '';
+  const name = localStorage.getItem(MEMBER_KEY) || '';
+  document.getElementById('settings-content').innerHTML = `
+    <div class="tricolour"></div>
+    <div style="padding:16px;color:var(--text2);font-size:13px">Signed in as <strong style="color:var(--text)">${name}</strong></div>
+    <div class="settings-row" onclick="loadData(true)">
+      <div class="settings-label">🔄 Refresh Data</div>
+      <div class="settings-value">${ago(appData?.lastFetchedAt)}</div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-label">📅 Update Schedule</div>
+      <div class="settings-value">8am, 1pm, 8pm UTC</div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-label">🔑 Club Code</div>
+      <div class="settings-value">${code}</div>
+    </div>
+    <div class="settings-row" onclick="window.open('https://testflight.apple.com/join/','_blank')">
+      <div class="settings-label">📱 iOS App (TestFlight)</div>
+      <div class="settings-value">→</div>
+    </div>
+    <div class="settings-row" onclick="window.open('https://medhamit-gith.github.io/dcc-weekly-spec/privacy-policy.html','_blank')">
+      <div class="settings-label">🔒 Privacy Policy</div>
+      <div class="settings-value">→</div>
+    </div>
+    <div class="settings-row" onclick="doLogout()" style="color:#ef4444">
+      <div class="settings-label" style="color:#ef4444">🚪 Log Out</div>
+    </div>
+    <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">
+      DCC Weekly Activities v2.0<br>Powered by Cloudflare Workers + Strava API
+    </div>
+  `;
+  document.getElementById('settings-panel').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settings-panel').classList.remove('open');
+}
+
+function doLogout() {
+  localStorage.removeItem(AUTH_KEY);
+  localStorage.removeItem(MEMBER_KEY);
+  localStorage.removeItem(CACHE_KEY);
+  location.reload();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PULL TO REFRESH
+// ══════════════════════════════════════════════════════════════════
+let ptStart = 0;
+const tc = document.getElementById('tab-content');
+tc.addEventListener('touchstart', e => { if (tc.scrollTop === 0) ptStart = e.touches[0].clientY; }, {passive:true});
+tc.addEventListener('touchend', e => {
+  if (tc.scrollTop === 0 && ptStart > 0) {
+    const dy = e.changedTouches[0].clientY - ptStart;
+    if (dy > 80) loadData(true);
+  }
+  ptStart = 0;
+}, {passive:true});
+
+// ══════════════════════════════════════════════════════════════════
+// SERVICE WORKER (inline)
+// ══════════════════════════════════════════════════════════════════
+function registerSW() {
+  if (!('serviceWorker' in navigator)) return;
+  const swCode = `
+const CACHE = 'dcc-v2';
+const ASSETS = [location.href];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  if (e.request.url.includes('club-data')) {
+    e.respondWith(
+      fetch(e.request).then(r => {
+        const clone = r.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return r;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+});
+`;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const url = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).catch(()=>{});
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AUTO REFRESH every 5 min
+// ══════════════════════════════════════════════════════════════════
+setInterval(() => { if (appData) loadData(true); }, 5 * 60 * 1000);
+</script>
+</body>
+</html>
