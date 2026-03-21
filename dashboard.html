@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0f1a">
+<title>DCC Weekly Activities</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f1a;--card:#111827;--card2:#1a2235;--border:#1e293b;--text:#f1f5f9;--muted:#94a3b8;--dim:#475569;--strava:#fc4c02;--gold:#f59e0b;--green:#10b981;--blue:#3b82f6;--purple:#8b5cf6;--teal:#14b8a6;--red:#ef4444;--saffron:#f59e0b;--white:#e2e8f0;--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+.page{max-width:480px;margin:0 auto;padding:0 16px 80px}
+.tri{height:4px;display:flex;position:sticky;top:0;z-index:10}
+.tri div{flex:1}.tri .saffron{background:var(--saffron)}.tri .white-band{background:var(--white)}.tri .green-band{background:var(--green)}
+.header{padding:20px 0 16px;text-align:center}.header h1{font-size:22px;font-weight:800;letter-spacing:-.5px}.header p{font-size:13px;color:var(--muted);margin-top:4px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:16px;background:rgba(252,76,2,.12);border:1px solid rgba(252,76,2,.25);font-size:11px;color:var(--strava);font-weight:600;margin-bottom:8px}
+.updated{font-size:11px;color:var(--dim);margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stat{background:var(--card);border-radius:var(--radius);padding:12px 10px;text-align:center;border:1px solid var(--border)}
+.stat-val{font-size:22px;font-weight:700;margin:2px 0}.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.tabs{display:flex;gap:4px;margin:16px 0 12px;background:var(--card);border-radius:10px;padding:3px;border:1px solid var(--border)}
+.tab{flex:1;text-align:center;padding:8px 0;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s}.tab.active{background:var(--strava);color:#fff}
+.lb-row{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin:6px 0;transition:transform .15s}.lb-row:active{transform:scale(.98)}
+.lb-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.lb-rank.gold{background:rgba(245,158,11,.15);color:var(--gold);border:1.5px solid rgba(245,158,11,.3)}.lb-rank.silver{background:rgba(148,163,184,.1);color:var(--muted);border:1.5px solid rgba(148,163,184,.2)}.lb-rank.bronze{background:rgba(180,83,9,.1);color:#b45309;border:1.5px solid rgba(180,83,9,.2)}.lb-rank.normal{background:var(--card2);color:var(--dim);border:1px solid var(--border)}
+.lb-info{flex:1;min-width:0}.lb-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lb-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.lb-dist{text-align:right;flex-shrink:0}.lb-dist-val{font-size:18px;font-weight:700;color:var(--teal)}.lb-dist-unit{font-size:10px;color:var(--dim)}
+.act{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin:6px 0}.act-name{font-size:13px;font-weight:600}.act-rider{font-size:11px;color:var(--strava);margin-top:2px}.act-stats{display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--muted)}.act-stat{display:flex;align-items:center;gap:3px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}.tbl th{text-align:left;padding:8px 6px;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg)}.tbl td{padding:8px 6px;border-bottom:1px solid var(--border)}.tbl tr:hover{background:var(--card)}.tbl .num{text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px}
+.loading{text-align:center;padding:60px 20px;color:var(--muted)}.loading .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--strava);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius);padding:16px;text-align:center;color:var(--red);margin:20px 0}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.footer{text-align:center;padding:24px 0;font-size:11px;color:var(--dim);border-top:1px solid var(--border);margin-top:24px}
+.hidden{display:none}@media(min-width:768px){.page{max-width:640px}}
+</style>
+</head>
+<body>
+<div class="tri"><div class="saffron"></div><div class="white-band"></div><div class="green-band"></div></div>
+<div class="page">
+<div class="header"><div class="badge">&#x1f6b4; Desi Cycling Club</div><h1>DCC Weekly Activities</h1><p>Club cycling stats \u2014 updated 3x daily</p><div class="updated" id="lastUpdated">Loading...</div></div>
+<div class="stats"><div class="stat"><div class="stat-val" id="totalRiders">-</div><div class="stat-label">Riders</div></div><div class="stat"><div class="stat-val" id="totalDistance">-</div><div class="stat-label">Total KM</div></div><div class="stat"><div class="stat-val" id="totalRides">-</div><div class="stat-label">Rides</div></div></div>
+<div class="tabs"><div class="tab active" onclick="showTab('leaderboard')">Leaderboard</div><div class="tab" onclick="showTab('table')">Table</div><div class="tab" onclick="showTab('activities')">Activities</div></div>
+<div id="loading" class="loading"><div class="spinner"></div><p>Fetching club data...</p></div>
+<div id="error" class="error-box hidden"></div>
+<div id="tab-leaderboard" class="hidden"></div>
+<div id="tab-table" class="hidden"></div>
+<div id="tab-activities" class="hidden"></div>
+<div class="footer">DCC Weekly Activities<br>Works on iPhone, Android, and desktop<br>Data from Strava &middot; Updated 3x daily</div>
+</div>
+<script>
+const API_URL="https://dcc-strava.amit-r-kamat.workers.dev/club-data";let clubData=null,currentTab="leaderboard";async function loadData(){const l=document.getElementById("loading"),e=document.getElementById("error");try{const r=await fetch(API_URL),d=await r.json();if(d.error&&!d.members?.length){l.classList.add("hidden");e.textContent=d.error;e.classList.remove("hidden");return}clubData=d;l.classList.add("hidden");renderSummary(d);renderLeaderboard(d.members);renderTable(d.members);renderActivities(d.members);showTab(currentTab)}catch(err){l.classList.add("hidden");e.textContent="Could not load club data.";e.classList.remove("hidden")}}function renderSummary(d){document.getElementById("totalRiders").textContent=d.memberCount||d.members.length;document.getElementById("totalDistance").textContent=Math.round(d.members.reduce((s,m)=>s+m.totalDistance,0)).toLocaleString();document.getElementById("totalRides").textContent=d.members.reduce((s,m)=>s+m.rideCount,0);if(d.lastFetchedAt)document.getElementById("lastUpdated").textContent="Updated "+timeAgo(new Date(d.lastFetchedAt))}function renderLeaderboard(m){const el=document.getElementById("tab-leaderboard");if(!m.length){el.innerHTML='<div class="empty">No rides yet</div>';return}el.innerHTML=m.map((m,i)=>`<div class="lb-row"><div class="lb-rank ${i===0?"gold":i===1?"silver":i===2?"bronze":"normal"}">${i+1}</div><div class="lb-info"><div class="lb-name">${esc(m.name)}</div><div class="lb-meta">${m.rideCount} ride${m.rideCount!==1?"s":""} &middot; ${m.avgSpeed} km/h &middot; ${m.totalElevation}m</div></div><div class="lb-dist"><div class="lb-dist-val">${m.totalDistance}</div><div class="lb-dist-unit">km</div></div></div>`).join("")}function renderTable(m){const el=document.getElementById("tab-table");if(!m.length){el.innerHTML='<div class="empty">No data</div>';return}let h='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>#</th><th>Rider</th><th class="num">KM</th><th class="num">Rides</th><th class="num">Avg</th><th class="num">Elev</th><th class="num">Time</th></tr></thead><tbody>';m.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td style="font-weight:600">${esc(m.name)}</td><td class="num" style="color:#14b8a6;font-weight:600">${m.totalDistance}</td><td class="num">${m.rideCount}</td><td class="num">${m.avgSpeed}</td><td class="num">${m.totalElevation}m</td><td class="num">${m.movingTimeFormatted||"-"}</td></tr>`});h+="</tbody></table></div>";el.innerHTML=h}function renderActivities(m){const el=document.getElementById("tab-activities"),a=[];m.forEach(m=>{(m.activities||[]).forEach(act=>{a.push({rider:m.name,...act})})});if(!a.length){el.innerHTML='<div class="empty">No activities</div>';return}el.innerHTML=a.map(a=>`<div class="act"><div class="act-name">${esc(a.name)}</div><div class="act-rider">${esc(a.rider)}</div><div class="act-stats"><div class="act-stat"><strong>${a.distance}</strong> km</div><div class="act-stat"><strong>${a.averageSpeed}</strong> km/h</div><div class="act-stat"><strong>${a.elevationGain}</strong>m</div><div class="act-stat">${fmtTime(a.movingTime)}</div></div></div>`).join("")}function showTab(n){currentTab=n;document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));document.querySelectorAll("[id^='tab-']").forEach(t=>t.classList.add("hidden"));document.querySelectorAll(".tab")[n==="leaderboard"?0:n==="table"?1:2].classList.add("active");document.getElementById("tab-"+n).classList.remove("hidden")}function timeAgo(d){const s=Math.floor((Date.now()-d.getTime())/1000);return s<60?"just now":s<3600?Math.floor(s/60)+" min ago":s<86400?Math.floor(s/3600)+" hours ago":Math.floor(s/86400)+" days ago"}function fmtTime(s){if(!s)return"-";const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h>0?h+"h "+m+"m":m+"m"}function esc(s){const d=document.createElement("div");d.textContent=s||"";return d.innerHTML}loadData();setInterval(loadData,300000);
+</script>
+</body>
+</html>
