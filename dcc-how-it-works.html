@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCC Weekly Activities — How Your Data Works</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fafaf8;--card:#fff;--border:#e8e6e1;--text:#1a1a18;--muted:#7a786f;--strava:#fc4c02;--strava-bg:#fff5f0;--strava-border:#fdd8c4;--apple:#007aff;--apple-bg:#f0f5ff;--apple-border:#c4d9f7;--green:#16a34a;--green-bg:#f0faf4;--green-border:#bbf0cd;--lock:#8b5cf6;--lock-bg:#f5f0ff;--lock-border:#d4c4f7;--cloud:#0ea5e9;--cloud-bg:#f0f9ff;--cloud-border:#bae6fd;--tv:#6366f1;--tv-bg:#eef0ff;--tv-border:#c7c9f7;--web:#ec4899;--web-bg:#fdf0f7;--web-border:#f7c4de;--danger:#dc2626;--danger-bg:#fef2f2;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-lg:0 4px 20px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);line-height:1.65}.page{max-width:900px;margin:0 auto;padding:40px 24px 60px}
+.hero{text-align:center;padding:48px 0 32px}.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:20px;background:var(--strava-bg);border:1px solid var(--strava-border);font-size:13px;color:var(--strava);font-weight:600;margin-bottom:16px}.hero h1{font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.5px;margin-bottom:8px}.hero p{font-size:17px;color:var(--muted);max-width:600px;margin:0 auto}
+.section{margin:48px 0 0}.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:8px}.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.flow{display:flex;flex-direction:column;gap:0;position:relative}.flow::before{content:'';position:absolute;left:31px;top:48px;bottom:48px;width:2px;background:var(--border);z-index:0}.step{display:flex;gap:16px;position:relative;z-index:1}.step-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;margin-top:18px;margin-left:22px;border:2.5px solid var(--card);box-shadow:0 0 0 2px var(--border)}.step-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin:6px 0;box-shadow:var(--shadow);transition:transform .15s}.step-card:hover{transform:translateX(4px)}.step-num{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}.step-title{font-size:18px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}.step-desc{font-size:15px;color:var(--muted)}.step-detail{margin-top:12px;padding:12px 16px;border-radius:10px;font-size:14px}
+.dot-strava{background:var(--strava)}.card-strava .step-detail{background:var(--strava-bg);color:#9a2e01;border:1px solid var(--strava-border)}.dot-lock{background:var(--lock)}.card-lock .step-detail{background:var(--lock-bg);color:#5b21b6;border:1px solid var(--lock-border)}.dot-cloud{background:var(--cloud)}.card-cloud .step-detail{background:var(--cloud-bg);color:#0369a1;border:1px solid var(--cloud-border)}.dot-green{background:var(--green)}.card-green .step-detail{background:var(--green-bg);color:#166534;border:1px solid var(--green-border)}.dot-tv{background:var(--tv)}.card-tv .step-detail{background:var(--tv-bg);color:#4338ca;border:1px solid var(--tv-border)}.dot-web{background:var(--web)}.card-web .step-detail{background:var(--web-bg);color:#9d174d;border:1px solid var(--web-border)}
+.diagram{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;box-shadow:var(--shadow-lg);margin:24px 0;overflow-x:auto}.diagram svg{display:block;margin:0 auto}
+.platforms{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.plat-btn{padding:10px 20px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}.plat-btn:hover{border-color:var(--strava);color:var(--strava)}.plat-btn.active{border-color:var(--strava);background:var(--strava-bg);color:var(--strava)}.plat-content{display:none}.plat-content.active{display:block}
+.insight{border-radius:14px;padding:20px 24px;margin:20px 0;display:flex;gap:16px;align-items:flex-start}.insight-icon{font-size:28px;flex-shrink:0;margin-top:2px}.insight h3{font-size:16px;font-weight:700;margin-bottom:4px}.insight p{font-size:14px;color:var(--muted)}.insight-good{background:var(--green-bg);border:1px solid var(--green-border)}.insight-good h3{color:#166534}.insight-info{background:var(--cloud-bg);border:1px solid var(--cloud-border)}.insight-info h3{color:#0369a1}
+.compare{width:100%;border-collapse:separate;border-spacing:0;margin:20px 0;font-size:14px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}.compare th{background:var(--bg);padding:12px 16px;text-align:left;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1px solid var(--border)}.compare td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top}.compare tr:last-child td{border-bottom:none}.compare .new{color:var(--green);font-weight:600}
+.glossary{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:20px 0}.gloss-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}.gloss-term{font-weight:700;font-size:15px;margin-bottom:4px}.gloss-def{font-size:13px;color:var(--muted)}
+.status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:20px 0}.status-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow);text-align:center}.status-val{font-size:28px;font-weight:800;margin:8px 0 4px}.status-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.footer{text-align:center;padding:32px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--border);margin-top:48px}
+@media(max-width:600px){.flow::before{left:21px}.step-dot{margin-left:12px}.step-card{padding:16px}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hero">
+  <div class="hero-badge">🚴 Desi Cycling Club</div>
+  <h1>How DCC Weekly Activities Works</h1>
+  <p>A plain-English guide to how the app keeps your data safe, stays fast, and works across iPhone, iPad, Android, and any browser.</p>
+</div>
+
+<div class="section">
+  <div class="section-label">Live now</div>
+  <div class="status-grid">
+    <div class="status-card"><div class="status-val" style="color:var(--strava)">12</div><div class="status-label">Active Riders</div></div>
+    <div class="status-card"><div class="status-val" style="color:var(--green)">3x</div><div class="status-label">Daily Updates</div></div>
+    <div class="status-card"><div class="status-val" style="color:var(--cloud)">4</div><div class="status-label">Platforms</div></div>
+    <div class="status-card"><div class="status-val" style="color:var(--lock)">10</div><div class="status-label">Security Layers</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">How the data flows</div>
+  <div class="insight insight-good">
+    <div class="insight-icon">✅</div>
+    <div>
+      <h3>Simple and reliable</h3>
+      <p>A dedicated "DCC Bot" account fetches the club's cycling data from Strava 3 times a day — at 8am, 1pm, and 8pm. Your app and the web dashboard read from this pre-fetched cache. No individual member needs a Strava account to view the stats.</p>
+    </div>
+  </div>
+  <div class="diagram">
+    <svg viewBox="0 0 820 440" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Outfit, sans-serif">
+      <rect x="0" y="0" width="820" height="440" rx="12" fill="#fafaf8"/>
+      <rect x="20" y="50" width="340" height="370" rx="14" fill="#fff" stroke="#e8e6e1" stroke-width="1"/>
+      <text x="190" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#7a786f" letter-spacing="1.5">YOUR DEVICES</text>
+      <rect x="460" y="50" width="340" height="160" rx="14" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+      <text x="630" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#0369a1" letter-spacing="1.5">CLOUDFLARE (CACHE)</text>
+      <rect x="460" y="240" width="340" height="180" rx="14" fill="#fff5f0" stroke="#fdd8c4" stroke-width="1"/>
+      <text x="630" y="268" text-anchor="middle" font-size="13" font-weight="700" fill="#9a2e01" letter-spacing="1.5">STRAVA SERVERS</text>
+      <rect x="50" y="95" width="120" height="70" rx="10" fill="#fff" stroke="#e8e6e1" stroke-width="1.5"/>
+      <text x="110" y="125" text-anchor="middle" font-size="20">📱</text>
+      <text x="110" y="148" text-anchor="middle" font-size="12" font-weight="600">iPhone / iPad</text>
+      <rect x="200" y="95" width="120" height="70" rx="10" fill="#fdf0f7" stroke="#f7c4de" stroke-width="1.5"/>
+      <text x="260" y="125" text-anchor="middle" font-size="20">🌐</text>
+      <text x="260" y="148" text-anchor="middle" font-size="12" font-weight="600">Android / Web</text>
+      <rect x="50" y="185" width="120" height="60" rx="10" fill="#fff5f0" stroke="#fdd8c4" stroke-width="1.5"/>
+      <text x="110" y="211" text-anchor="middle" font-size="16">🔑</text>
+      <text x="110" y="231" text-anchor="middle" font-size="11" font-weight="600" fill="#9a2e01">Club Code</text>
+      <rect x="200" y="185" width="120" height="60" rx="10" fill="#f5f0ff" stroke="#d4c4f7" stroke-width="1.5"/>
+      <text x="260" y="211" text-anchor="middle" font-size="16">🔐</text>
+      <text x="260" y="231" text-anchor="middle" font-size="11" font-weight="600" fill="#5b21b6">Face ID</text>
+      <rect x="80" y="265" width="200" height="55" rx="10" fill="#f0faf4" stroke="#bbf0cd" stroke-width="1.5"/>
+      <text x="180" y="289" text-anchor="middle" font-size="16">💾</text>
+      <text x="180" y="306" text-anchor="middle" font-size="11" font-weight="600" fill="#166534">Offline Cache</text>
+      <rect x="100" y="340" width="160" height="40" rx="10" fill="#f0f5ff" stroke="#c4d9f7" stroke-width="1.5"/>
+      <text x="180" y="360" text-anchor="middle" font-size="11" font-weight="600" fill="#1d4ed8">🔒 All connections HTTPS</text>
+      <text x="180" y="373" text-anchor="middle" font-size="10" fill="#7a786f">Encrypted in transit</text>
+      <rect x="490" y="95" width="280" height="90" rx="10" fill="#fff" stroke="#bae6fd" stroke-width="1.5"/>
+      <text x="630" y="122" text-anchor="middle" font-size="20">⚡</text>
+      <text x="630" y="142" text-anchor="middle" font-size="14" font-weight="700" fill="#0369a1">Cloudflare Worker</text>
+      <text x="630" y="158" text-anchor="middle" font-size="11" fill="#7a786f">Club data cached for all users</text>
+      <text x="630" y="172" text-anchor="middle" font-size="11" fill="#7a786f">Updated 3x daily at 8am, 1pm, 8pm</text>
+      <rect x="490" y="290" width="280" height="50" rx="10" fill="#fff" stroke="#fdd8c4" stroke-width="1.5"/>
+      <text x="630" y="312" text-anchor="middle" font-size="14" font-weight="700" fill="#9a2e01">🤖 DCC Bot Account</text>
+      <text x="630" y="328" text-anchor="middle" font-size="11" fill="#7a786f">Dedicated club member — fetches data</text>
+      <rect x="490" y="360" width="280" height="45" rx="10" fill="#fff" stroke="#fdd8c4" stroke-width="1.5"/>
+      <text x="630" y="383" text-anchor="middle" font-size="13" font-weight="600" fill="#fc4c02">Strava API — Club Activities</text>
+      <text x="630" y="397" text-anchor="middle" font-size="10" fill="#7a786f">Read-only — no GPS, no heartrate, no email</text>
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="inherit" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+      <line x1="340" y1="130" x2="488" y2="130" stroke="#0ea5e9" stroke-width="2" marker-end="url(#ah)"/>
+      <text x="414" y="122" text-anchor="middle" font-size="10" fill="#0ea5e9" font-weight="600">reads data</text>
+      <line x1="630" y1="340" x2="630" y2="358" stroke="#fc4c02" stroke-width="2" marker-end="url(#ah)"/>
+      <text x="688" y="353" font-size="10" fill="#fc4c02" font-weight="600">3x/day</text>
+      <path d="M 630 290 L 630 187" fill="none" stroke="#0ea5e9" stroke-width="2" marker-end="url(#ah)"/>
+      <text x="648" y="238" font-size="10" fill="#0ea5e9" font-weight="600">writes</text>
+      <path d="M 488 170 L 282 268" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#ah)"/>
+      <text x="370" y="228" font-size="10" fill="#16a34a" font-weight="600">saved locally</text>
+    </svg>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">How it works on each device</div>
+  <div class="platforms">
+    <button class="plat-btn active" onclick="showPlatform('iphone')">📱 iPhone / iPad</button>
+    <button class="plat-btn" onclick="showPlatform('android')">🌐 Android / Web</button>
+    <button class="plat-btn" onclick="showPlatform('tv')">📺 Apple TV</button>
+  </div>
+
+  <div id="plat-iphone" class="plat-content active">
+    <div class="flow">
+      <div class="step"><div class="step-dot dot-strava"></div><div class="step-card card-strava"><div class="step-num">Step 1 — First time only</div><div class="step-title">🔑 Enter your club code</div><div class="step-desc">Open the app and enter your name and the DCC club access code (shared via the club WhatsApp group). No Strava account needed — the club bot handles all data fetching on your behalf.</div><div class="step-detail">The club code verifies you're a DCC member. It's stored on your device so you only enter it once.</div></div></div>
+      <div class="step"><div class="step-dot dot-lock"></div><div class="step-card card-lock"><div class="step-num">Step 2 — Every time you open the app</div><div class="step-title">🔐 Face ID / Touch ID</div><div class="step-desc">The app uses Face ID (or Touch ID on older iPhones) to verify it's you. No passwords. Even if someone picks up your phone, they can't access the app without your face or fingerprint.</div><div class="step-detail">The biometric check happens every time. There's no grace period — it always verifies.</div></div></div>
+      <div class="step"><div class="step-dot dot-cloud"></div><div class="step-card card-cloud"><div class="step-num">Step 3 — Automatic</div><div class="step-title">⚡ Club data loads from Cloudflare</div><div class="step-desc">The app fetches this week's club activities from a Cloudflare server — NOT from Strava directly. The DCC Bot has already collected the data 3 times today and cached it for everyone.</div><div class="step-detail">12 members opening the app = 12 reads from the cache (unlimited), instead of 12 direct calls to Strava.</div></div></div>
+      <div class="step"><div class="step-dot dot-green"></div><div class="step-card card-green"><div class="step-num">Step 4 — You're in</div><div class="step-title">📊 See your club's stats</div><div class="step-desc">Charts, tables, leaderboards, rider analysis, insights, coaching tips — all displayed instantly. Even without internet, the app shows the last data it downloaded.</div><div class="step-detail">Five tabs: Overview, Leaderboard, Charts, Insights, and Analysis — with drill-down into individual rider stats.</div></div></div>
+    </div>
+  </div>
+
+  <div id="plat-android" class="plat-content">
+    <div class="flow">
+      <div class="step"><div class="step-dot dot-web"></div><div class="step-card card-web"><div class="step-num">Step 1 — Open the link</div><div class="step-title">🌐 Open the dashboard in any browser</div><div class="step-desc">Open the club dashboard link (shared via WhatsApp) in Chrome, Safari, or any browser. No app to install — it just works on any phone, tablet, or computer.</div><div class="step-detail">Link: medhamit-gith.github.io/dcc-weekly-spec/dashboard.html</div></div></div>
+      <div class="step"><div class="step-dot dot-green"></div><div class="step-card card-green"><div class="step-num">Step 2 — You're in</div><div class="step-title">📊 Same data, any device</div><div class="step-desc">The web dashboard shows the same leaderboard, data table, and activity feed as the iOS app. Same data, same update frequency (3x daily). Bookmark it or add to your home screen.</div><div class="step-detail">Auto-refreshes every 5 minutes. No login required.</div></div></div>
+      <div class="step"><div class="step-dot dot-cloud"></div><div class="step-card card-cloud"><div class="step-num">Step 3 — Optional</div><div class="step-title">📌 Add to home screen</div><div class="step-desc">On Android: browser menu → "Add to Home screen". On iPhone Safari: share button → "Add to Home Screen". It looks and feels like a native app.</div></div></div>
+    </div>
+  </div>
+
+  <div id="plat-tv" class="plat-content">
+    <div class="flow">
+      <div class="step"><div class="step-dot dot-tv"></div><div class="step-card card-tv"><div class="step-num">Step 1 — First time only</div><div class="step-title">📺 Enter club code on TV</div><div class="step-desc">Enter your name and "DCC2026" using the Siri Remote's on-screen keyboard. Same club code as the iPhone app.</div><div class="step-detail">One-time setup — the code is saved on the Apple TV.</div></div></div>
+      <div class="step"><div class="step-dot dot-cloud"></div><div class="step-card card-cloud"><div class="step-num">Step 2 — Automatic</div><div class="step-title">⚡ Same data, TV-optimised</div><div class="step-desc">Reads from the same Cloudflare cache. Designed for the living room — big numbers, bold text, Siri Remote navigation.</div></div></div>
+      <div class="step"><div class="step-dot dot-green"></div><div class="step-card card-green"><div class="step-num">Step 3 — You're in</div><div class="step-title">📊 Big screen leaderboard</div><div class="step-desc">Perfect for the clubhouse. Navigate between Overview, Leaderboard, Insights, and Analysis tabs with the Siri Remote. Parallax effects on rider cards give it that premium Apple TV feel.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Your data is protected</div>
+  <div class="glossary">
+    <div class="gloss-card"><div class="gloss-term">🔑 Club code access</div><div class="gloss-def">The iOS app requires a shared club code to access. No Strava account needed. The code is shared only with DCC members via WhatsApp.</div></div>
+    <div class="gloss-card"><div class="gloss-term">🔐 Face ID / Touch ID</div><div class="gloss-def">Verifies your identity with biometrics every time you open the app. Uses Apple's Secure Enclave hardware — your biometric data never leaves the device.</div></div>
+    <div class="gloss-card"><div class="gloss-term">🔒 HTTPS everywhere</div><div class="gloss-def">Every connection uses encrypted HTTPS (TLS 1.3). No data travels unencrypted.</div></div>
+    <div class="gloss-card"><div class="gloss-term">👤 What the app can see</div><div class="gloss-def">Only aggregate club stats: first name + last initial, distances, speeds, elevation, ride titles. CANNOT see GPS routes, heart rate, power, private activities, or email addresses.</div></div>
+    <div class="gloss-card"><div class="gloss-term">🚫 What the app cannot do</div><div class="gloss-def">Cannot post on your behalf, modify activities, message athletes, track your location, or access anything beyond public club statistics.</div></div>
+    <div class="gloss-card"><div class="gloss-term">🤖 The DCC Bot</div><div class="gloss-def">A dedicated Strava account controlled by the app administrator. Fetches club data 3x daily using read-only permissions. Your personal Strava account is never touched.</div></div>
+    <div class="gloss-card"><div class="gloss-term">🔐 Secret isolation</div><div class="gloss-def">The Strava API key lives ONLY on the Cloudflare server — never in the app. Even if someone decompiled the app, they wouldn't find it.</div></div>
+    <div class="gloss-card"><div class="gloss-term">📋 Privacy compliance</div><div class="gloss-def">The app declares no tracking, no tracking domains, no third-party analytics via Apple's PrivacyInfo.xcprivacy manifest.</div></div>
+  </div>
+  <div class="insight insight-info">
+    <div class="insight-icon">🛡️</div>
+    <div>
+      <h3>No personal data leaves your device</h3>
+      <p>The only data that travels over the internet is aggregate club stats (distances, speeds, elevation) — the same information visible on Strava's club page. No GPS routes, no heart rate, no email addresses, no athlete IDs. Strava strips all of this from the club data endpoint for privacy.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-label">Platform comparison</div>
+  <table class="compare">
+    <tr><th></th><th>iPhone / iPad</th><th>Android / Web</th><th>Apple TV</th></tr>
+    <tr><td style="font-weight:600">How to access</td><td>TestFlight invite</td><td>Open web link</td><td>TestFlight invite</td></tr>
+    <tr><td style="font-weight:600">Authentication</td><td>Club code + Face ID</td><td>No login needed</td><td>Club code</td></tr>
+    <tr><td style="font-weight:600">Leaderboard</td><td class="new">✅</td><td class="new">✅</td><td class="new">✅</td></tr>
+    <tr><td style="font-weight:600">Charts & graphs</td><td class="new">✅ Bar, radar, scatter</td><td>Coming soon</td><td class="new">✅</td></tr>
+    <tr><td style="font-weight:600">Insights & coaching</td><td class="new">✅</td><td>Coming soon</td><td class="new">✅</td></tr>
+    <tr><td style="font-weight:600">Rider drill-down</td><td class="new">✅</td><td>Coming soon</td><td class="new">✅</td></tr>
+    <tr><td style="font-weight:600">Offline support</td><td class="new">✅ Cached locally</td><td>Browser cache</td><td class="new">✅</td></tr>
+    <tr><td style="font-weight:600">Data freshness</td><td>3x daily</td><td>3x daily + auto-refresh</td><td>3x daily</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-label">Jargon buster</div>
+  <div class="glossary">
+    <div class="gloss-card"><div class="gloss-term">API</div><div class="gloss-def">The way apps talk to each other. When DCC fetches data from Strava, it uses Strava's API — a structured way to request information.</div></div>
+    <div class="gloss-card"><div class="gloss-term">Cloudflare Worker</div><div class="gloss-def">A small program running on Cloudflare's global servers. It fetches club data from Strava, caches it, and serves it to all DCC members. A fast middleman.</div></div>
+    <div class="gloss-card"><div class="gloss-term">Rate limit</div><div class="gloss-def">A cap on how many times an app can ask Strava for data. The Bot architecture avoids this by making only ~9 requests per day total.</div></div>
+    <div class="gloss-card"><div class="gloss-term">TestFlight</div><div class="gloss-def">Apple's official app for testing apps before they go to the App Store. Only invited people can install. Free and safe.</div></div>
+    <div class="gloss-card"><div class="gloss-term">Face ID</div><div class="gloss-def">Apple's facial recognition. Uses the iPhone's TrueDepth camera to create a 3D map of your face. Data stays in the Secure Enclave chip — never leaves your device.</div></div>
+    <div class="gloss-card"><div class="gloss-term">HTTPS</div><div class="gloss-def">The encrypted version of HTTP. The padlock in your browser means HTTPS is active. All DCC data travels over HTTPS — nobody can eavesdrop.</div></div>
+  </div>
+</div>
+
+<div class="footer">
+  DCC Weekly Activities — How It Works v2.0<br>
+  Desi Cycling Club · March 2026
+</div>
+</div>
+<script>
+function showPlatform(id){document.querySelectorAll('.plat-content').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.plat-btn').forEach(el=>el.classList.remove('active'));document.getElementById('plat-'+id).classList.add('active');event.target.classList.add('active')}
+</script>
+</body>
+</html>
