@@ -793,7 +793,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 <nav class="sidenav">
   <div class="sidenav-logo">
     <div class="logo-text">DCC<span>Weekly</span></div>
-    <div class="logo-sub">Architecture Spec v2.0</div>
+    <div class="logo-sub">Architecture Spec v3.0</div>
   </div>
 
   <div class="sidenav-section">
@@ -815,7 +815,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
       <div class="nav-dot" style="background:var(--gold)"></div>Launch / Biometric
     </a>
     <a href="#screen-login" class="nav-item">
-      <div class="nav-dot" style="background:var(--strava)"></div>Login / OAuth
+      <div class="nav-dot" style="background:var(--strava)"></div>Club Code Login
     </a>
     <a href="#screen-charts" class="nav-item">
       <div class="nav-dot" style="background:var(--teal)"></div>Charts View
@@ -849,7 +849,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
       <div class="nav-dot" style="background:var(--green)"></div>Performance
     </a>
     <a href="#wwdc2025" class="nav-item">
-      <div class="nav-dot" style="background:var(--gold)"></div>WWDC 2025 Upgrades
+      <div class="nav-dot" style="background:var(--gold)"></div>Already Implemented (Swift 6)s
     </a>
     <a href="#roadmap" class="nav-item">
       <div class="nav-dot" style="background:var(--text3)"></div>Roadmap
@@ -875,7 +875,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
   </div>
 
   <div class="sidenav-footer">
-    <div class="version-badge">DCC Weekly · v1.0 · March 2026<br>Senior Architect Review</div>
+    <div class="version-badge">DCC Weekly · v3.0 · March 2026<br>Amit Kamat — Technical PM</div>
   </div>
 </nav>
 
@@ -891,32 +891,32 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
     <div class="hero-orb" style="width:400px;height:400px;background:var(--teal);bottom:-100px;left:-50px;"></div>
   </div>
 
-  <div class="cover-kicker fade-up">Senior Architect Design Document</div>
+  <div class="cover-kicker fade-up">Architecture & Screen Specification</div>
 
   <h1 class="cover-title fade-up d1">
     DCC<span class="line2">Weekly</span><span class="line3">Activities</span>
   </h1>
 
   <p class="cover-desc fade-up d2">
-    A comprehensive screen-by-screen specification covering every user interface, data element, interaction pattern, and technical architecture decision for the DCC cycling club iOS application. Built on SwiftUI + Strava API v3.
+    A comprehensive screen-by-screen specification covering every user interface, data element, interaction pattern, and technical architecture decision for the Desi Cycling Club iOS application. Built on SwiftUI + Cloudflare Workers + Strava API v3. Approach A: Club code auth with serverless backend.
   </p>
 
   <div class="cover-meta-grid fade-up d3">
     <div class="cover-meta">
-      <div class="cm-val" style="color:var(--strava)">9</div>
-      <div class="cm-label">Unique Screens</div>
+      <div class="cm-val" style="color:var(--strava)">55+</div>
+      <div class="cm-label">Features Shipped</div>
     </div>
     <div class="cover-meta">
       <div class="cm-val" style="color:var(--teal)">3</div>
-      <div class="cm-label">Platforms</div>
+      <div class="cm-label">Platforms (iOS, tvOS, PWA)</div>
     </div>
     <div class="cover-meta">
-      <div class="cm-val" style="color:var(--blue)">4</div>
+      <div class="cm-val" style="color:var(--blue)">5</div>
       <div class="cm-label">Security Layers</div>
     </div>
     <div class="cover-meta">
-      <div class="cm-val" style="color:var(--gold)">14</div>
-      <div class="cm-label">Total Sections</div>
+      <div class="cm-val" style="color:var(--gold)">22K</div>
+      <div class="cm-label">Lines of Swift</div>
     </div>
   </div>
 
@@ -949,10 +949,10 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
     <div>
       <div class="section-num">01 — System Architecture</div>
       <div class="section-title">How It's <span style="color:var(--blue)">Built</span></div>
-      <div class="section-desc">A layered architecture separating concerns cleanly across UI, business logic, services, and data. iOS native SwiftUI with Strava API integration.</div>
+      <div class="section-desc">A layered architecture across UI, business logic, services, and data. iOS native SwiftUI with Cloudflare Worker backend. Approach A: club code auth, no client-side OAuth. 80 Swift files, ~22K lines.</div>
     </div>
     <div class="section-tags">
-      <span class="tag" style="background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,0.2);">SwiftUI iOS 18</span>
+      <span class="tag" style="background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,0.2);">SwiftUI iOS 17+</span>
       <span class="tag" style="background:var(--teal-dim);color:var(--teal);border:1px solid rgba(0,201,167,0.2);">Swift 6</span>
     </div>
   </div>
@@ -976,8 +976,8 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
         </div>
         <div class="card-sm" style="border-color:rgba(168,85,247,0.15);background:var(--purple-dim);text-align:center;opacity:0.6;">
           <div style="font-size:24px;margin-bottom:6px;">⌚</div>
-          <div style="font-size:11px;font-weight:600;color:var(--purple);">watchOS</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);margin-top:2px;">Phase 2 → Planned</div>
+          <div style="font-size:11px;font-weight:600;color:var(--purple);">PWA (Android/Web)</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);margin-top:2px;">SCRUM-53 → In Progress</div>
         </div>
       </div>
 
@@ -987,10 +987,10 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
       <div style="grid-column:1/-1;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;">
         <div class="label" style="margin-bottom:12px;">Presentation Layer — SwiftUI Views</div>
         <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;">
-          <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--teal);">ContentView</div>
-          <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--strava);">LoginScreen</div>
-          <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--blue);">ChartsView</div>
-          <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--purple);">TableView</div>
+          <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--teal);">RootView</div>
+          <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--strava);">ClubCodeLoginView</div>
+          <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--blue);">MemberStatsChartView</div>
+          <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--purple);">WeeklyReportTableView</div>
           <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--green);">InsightsView</div>
           <div style="background:var(--bg4);border-radius:8px;padding:8px;text-align:center;font-size:10px;font-weight:500;color:var(--gold);">TVViews</div>
         </div>
@@ -1014,16 +1014,16 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
       <!-- Layer 4: Services -->
       <div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
         <div class="card-sm" style="border-color:rgba(252,76,2,0.25);">
-          <div style="font-size:11px;font-weight:600;color:var(--strava);margin-bottom:8px;">🚴 StravaAPI.swift</div>
-          <div style="font-size:10px;color:var(--text2);">OAuth flow, token management, club activities fetch, rate limit handling, response parsing</div>
+          <div style="font-size:11px;font-weight:600;color:var(--strava);margin-bottom:8px;">🚴 CloudDataFetcher.swift</div>
+          <div style="font-size:10px;color:var(--text2);">Async fetch from Cloudflare Worker /club-data endpoint, JSON parsing, week boundary tracking, Activity conversion</div>
         </div>
         <div class="card-sm" style="border-color:rgba(239,68,68,0.2);">
           <div style="font-size:11px;font-weight:600;color:var(--red);margin-bottom:8px;">🔐 BiometricAuth.swift</div>
-          <div style="font-size:10px;color:var(--text2);">Face ID / Touch ID via LocalAuthentication, fallback to PIN, state management</div>
+          <div style="font-size:10px;color:var(--text2);">Face ID / Touch ID via LocalAuthentication. Lazy LAContext to avoid XPC 501. Session persistence via isAuthenticated state</div>
         </div>
         <div class="card-sm" style="border-color:rgba(245,158,11,0.2);">
-          <div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:8px;">📦 DataCache.swift</div>
-          <div style="font-size:10px;color:var(--text2);">JSON local cache, UserDefaults persistence, TTL management, offline fallback</div>
+          <div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:8px;">📦 WeeklyCache.swift</div>
+          <div style="font-size:10px;color:var(--text2);">Disk cache with 14-day TTL, MemberSnapshot persistence, previous-week lookup for trend calculation</div>
         </div>
       </div>
 
@@ -1037,35 +1037,35 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
       <table class="data-table">
         <thead><tr><th>File</th><th>Purpose</th><th>Layer</th></tr></thead>
         <tbody>
-          <tr><td style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:10px;">ContentView.swift</td><td>Main coordinator, state mgmt</td><td><span class="ux-badge" style="background:var(--teal-dim);color:var(--teal);">UI</span></td></tr>
-          <tr><td style="color:var(--blue);font-family:'JetBrains Mono',monospace;font-size:10px;">MemberStatsChartView.swift</td><td>Swift Charts visualizations</td><td><span class="ux-badge" style="background:var(--blue-dim);color:var(--blue);">UI</span></td></tr>
-          <tr><td style="color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:10px;">MemberStatsTableView.swift</td><td>Sortable data table</td><td><span class="ux-badge" style="background:var(--purple-dim);color:var(--purple);">UI</span></td></tr>
-          <tr><td style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:10px;">TVViews.swift</td><td>Apple TV specific UI</td><td><span class="ux-badge" style="background:var(--gold-dim);color:var(--gold);">UI</span></td></tr>
-          <tr><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;">ClubActivity.swift</td><td>Activity data model</td><td><span class="ux-badge" style="background:var(--bg4);color:var(--text3);">Model</span></td></tr>
-          <tr><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;">MemberStats.swift</td><td>Aggregated stats model</td><td><span class="ux-badge" style="background:var(--bg4);color:var(--text3);">Model</span></td></tr>
-          <tr><td style="color:var(--strava);font-family:'JetBrains Mono',monospace;font-size:10px;">StravaAPI.swift</td><td>API integration service</td><td><span class="ux-badge" style="background:var(--strava-dim);color:var(--strava);">Service</span></td></tr>
-          <tr><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:10px;">BiometricAuth.swift</td><td>Authentication service</td><td><span class="ux-badge" style="background:rgba(239,68,68,0.1);color:var(--red);">Service</span></td></tr>
-          <tr><td style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:10px;">DataCache.swift</td><td>Local caching service</td><td><span class="ux-badge" style="background:var(--gold-dim);color:var(--gold);">Service</span></td></tr>
+          <tr><td style="color:var(--teal);font-family:'JetBrains Mono',monospace;font-size:10px;">RootView.swift</td><td>Auth gating, launch animation, navigation (2,448 lines)</td><td><span class="ux-badge" style="background:var(--teal-dim);color:var(--teal);">UI</span></td></tr>
+          <tr><td style="color:var(--blue);font-family:'JetBrains Mono',monospace;font-size:10px;">MemberStatsChartView.swift</td><td>Swift Charts: radar, scatter, bar charts (806 lines)</td><td><span class="ux-badge" style="background:var(--blue-dim);color:var(--blue);">UI</span></td></tr>
+          <tr><td style="color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:10px;">WeeklyReportTableView.swift</td><td>Weekly report with trend arrows (403 lines)</td><td><span class="ux-badge" style="background:var(--purple-dim);color:var(--purple);">UI</span></td></tr>
+          <tr><td style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:10px;">TVRootView.swift</td><td>tvOS navigation root + 4 tab views (943 lines)</td><td><span class="ux-badge" style="background:var(--gold-dim);color:var(--gold);">UI</span></td></tr>
+          <tr><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;">Activity.swift</td><td>Activity model: distance, speed, elevation, type (44 lines)</td><td><span class="ux-badge" style="background:var(--bg4);color:var(--text3);">Model</span></td></tr>
+          <tr><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:10px;">MemberStats.swift</td><td>Per-member stats with TrendDirection enum (64 lines)</td><td><span class="ux-badge" style="background:var(--bg4);color:var(--text3);">Model</span></td></tr>
+          <tr><td style="color:var(--strava);font-family:'JetBrains Mono',monospace;font-size:10px;">CloudDataFetcher.swift</td><td>Cloudflare Worker data fetch service (137 lines)</td><td><span class="ux-badge" style="background:var(--strava-dim);color:var(--strava);">Service</span></td></tr>
+          <tr><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:10px;">BiometricAuth.swift</td><td>Face ID / Touch ID biometric gate (361 lines)</td><td><span class="ux-badge" style="background:rgba(239,68,68,0.1);color:var(--red);">Service</span></td></tr>
+          <tr><td style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:10px;">WeeklyCache.swift</td><td>Disk cache with MemberSnapshot (146 lines)</td><td><span class="ux-badge" style="background:var(--gold-dim);color:var(--gold);">Service</span></td></tr>
         </tbody>
       </table>
     </div>
     <div class="card">
       <div class="label">State Management Pattern</div>
       <div style="background:var(--bg3);border-radius:10px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:2;margin-bottom:16px;border:1px solid var(--border);">
-        <span style="color:var(--purple);">@StateObject</span> <span style="color:var(--blue);">var</span> stravaAPI: StravaAPI<br>
-        <span style="color:var(--purple);">@StateObject</span> <span style="color:var(--blue);">var</span> biometricAuth: BiometricAuth<br>
-        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> activities: [ClubActivity]<br>
-        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> memberStats: [MemberStats]<br>
-        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> isLoading: Bool<br>
-        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> errorMessage: String?<br>
-        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> viewMode: ViewMode<br>
-        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> dateRange: (Date, Date)?
+        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> clubAuth = ClubCodeAuthService.shared<br>
+        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> biometric = BiometricAuth.shared<br>
+        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> cloudData = CloudDataFetcher.shared<br>
+        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> stats: [MemberStats] = []<br>
+        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> activities: [Activity] = []<br>
+        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> athleteProfile: AthleteProfile?<br>
+        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> isLoading: Bool = false<br>
+        <span style="color:var(--purple);">@State</span> <span style="color:var(--blue);">var</span> selectedWeekOffset: Int = 0
       </div>
       <div class="callout" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);">
         <div class="callout-icon">💡</div>
         <div class="callout-content">
           <div class="callout-title" style="color:var(--blue);">WWDC 2025 Upgrade</div>
-          <div style="font-size:11px;color:var(--text2);">Migrate @StateObject → @Observable macro (Swift 6). Eliminates unnecessary redraws, improves performance, and aligns with Apple's 2025 recommended architecture.</div>
+          <div style="font-size:11px;color:var(--text2);">Already migrated to @Observable macro (Swift 6). All singletons use @Observable + @MainActor pattern. Eliminates unnecessary redraws. ClubCodeAuthService.shared, CloudDataFetcher.shared, BiometricAuth.shared, FeatureRequestService.shared all follow this pattern.</div>
         </div>
       </div>
     </div>
@@ -1080,7 +1080,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
     <div>
       <div class="section-num">02 — Data Flow</div>
       <div class="section-title">How Data <span style="color:var(--teal)">Travels</span></div>
-      <div class="section-desc">From Strava's servers to every pixel on screen — every step, every transformation, every decision point in the data pipeline.</div>
+      <div class="section-desc">From Strava's servers through Cloudflare Workers to every pixel on screen. Approach A: Cloudflare Worker fetches Strava data server-side, aggregates per-member stats, caches in KV, and serves JSON to the iOS app via /club-data endpoint.</div>
     </div>
     <div class="section-tags">
       <span class="tag" style="background:var(--teal-dim);color:var(--teal);border:1px solid rgba(0,201,167,0.2);">async/await</span>
@@ -1132,7 +1132,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
         <div class="flow-arrow">↓</div>
         <div class="card-sm"><div style="font-size:11px;font-weight:600;margin-bottom:2px;">③ GET /clubs/{id}/activities</div><div style="font-size:10px;color:var(--text3);">URLSession async/await · TLS 1.3</div></div>
         <div class="flow-arrow">↓</div>
-        <div class="card-sm"><div style="font-size:11px;font-weight:600;margin-bottom:2px;">④ JSON Decode</div><div style="font-size:10px;color:var(--text3);">Codable → [ClubActivity] · validate</div></div>
+        <div class="card-sm"><div style="font-size:11px;font-weight:600;margin-bottom:2px;">④ JSON Decode</div><div style="font-size:10px;color:var(--text3);">Codable → [Activity] · validate</div></div>
         <div class="flow-arrow">↓</div>
         <div class="card-sm"><div style="font-size:11px;font-weight:600;margin-bottom:2px;">⑤ Cache Locally</div><div style="font-size:10px;color:var(--text3);">JSON persist · timestamp · TTL</div></div>
         <div class="flow-arrow">↓</div>
@@ -1145,7 +1145,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
       <div class="label" style="color:var(--teal);">Statistics Aggregation</div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;">
         <div class="card-sm" style="border-color:rgba(0,201,167,0.15);">
-          <div style="font-size:10px;font-weight:600;color:var(--teal);margin-bottom:6px;">Input: [ClubActivity]</div>
+          <div style="font-size:10px;font-weight:600;color:var(--teal);margin-bottom:6px;">Input: [Activity]</div>
           <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);line-height:1.8;">
             • athlete.firstname + lastname<br>
             • distance (metres)<br>
@@ -2237,7 +2237,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
   <div class="section-header">
     <div>
       <div class="section-num">11 — API Integration</div>
-      <div class="section-title">Strava <span style="color:var(--strava)">API v3</span></div>
+      <div class="section-title">Cloudflare Worker <span style="color:var(--strava)">+ APIs</span></div>
       <div class="section-desc">Four endpoints, careful rate limit management, dual-week data strategy for trend calculation. The only data source — everything visual is derived from these JSON responses.</div>
     </div>
   </div>
@@ -2324,7 +2324,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
   <div class="section-header">
     <div>
       <div class="section-num">12 — State Management</div>
-      <div class="section-title">Single Source <span style="color:var(--purple)">of Truth</span></div>
+      <div class="section-title">@Observable <span style="color:var(--purple)">Singletons</span></div>
       <div class="section-desc">All app state lives in ContentView and flows down to child views via property injection. No global singletons, no shared mutable state between views.</div>
     </div>
   </div>
@@ -2452,7 +2452,7 @@ hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
   <div class="section-header">
     <div>
       <div class="section-num">14 — WWDC 2025 Upgrade Plan</div>
-      <div class="section-title">Next <span style="color:var(--gold)">Level</span></div>
+      <div class="section-title">Shipped <span style="color:var(--gold)">& Planned</span></div>
       <div class="section-desc">Apple's 2025 developer conference introduced transformative APIs. Adopting these early makes DCC Weekly look like a first-party Apple app and dramatically improves the experience.</div>
     </div>
     <div class="section-tags">
