@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCC Weekly Activities — How Data Flows</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&family=Playfair+Display:wght@700;800;900&display=swap');
+:root {
+  --strava:#FC4C02; --strava-dim:rgba(252,76,2,0.12); --teal:#00C9A7; --teal-dim:rgba(0,201,167,0.1);
+  --blue:#3B82F6; --blue-dim:rgba(59,130,246,0.1); --green:#22C55E; --green-dim:rgba(34,197,94,0.1);
+  --gold:#F59E0B; --gold-dim:rgba(245,158,11,0.1); --red:#EF4444; --purple:#A855F7; --purple-dim:rgba(168,85,247,0.1);
+  --bg:#080810; --bg2:#0D0D1A; --bg3:#111120; --bg4:#16162A; --bg5:#1C1C35;
+  --card:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --text:#F0F0F8; --text2:rgba(240,240,248,0.6); --text3:rgba(240,240,248,0.35);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Familjen Grotesk',sans-serif;font-size:13px;line-height:1.6;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.4}
+
+.container{max-width:900px;margin:0 auto;padding:0 24px}
+
+/* HERO */
+.hero{padding:64px 0 48px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;right:-100px;width:600px;height:600px;border-radius:50%;background:var(--strava);filter:blur(80px);opacity:0.1}
+.hero::after{content:'';position:absolute;bottom:-100px;left:-50px;width:400px;height:400px;border-radius:50%;background:var(--teal);filter:blur(80px);opacity:0.08}
+.hero-kicker{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--strava);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.hero-kicker::before{content:'';width:32px;height:1px;background:var(--strava)}
+.hero h1{font-family:'Playfair Display',serif;font-size:52px;font-weight:900;line-height:0.95;letter-spacing:-1.5px;margin-bottom:20px}
+.hero h1 span{color:var(--strava);display:block}
+.hero-desc{font-size:15px;color:var(--text2);max-width:620px;line-height:1.7;margin-bottom:32px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:600px}
+.hero-stat{border-left:2px solid var(--border2);padding-left:14px}
+.hero-stat .val{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;line-height:1}
+.hero-stat .lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px}
+
+/* SECTIONS */
+.section{padding:48px 0;border-top:1px solid var(--border)}
+.section-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
+.section-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;line-height:1;margin-bottom:10px}
+.section-desc{font-size:13px;color:var(--text2);max-width:560px;line-height:1.7;margin-bottom:32px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden;margin-bottom:20px}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent)}
+.card-sm{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px}
+.label{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:10px}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.05em;text-transform:uppercase}
+
+/* FLOW */
+.flow{display:flex;flex-direction:column;gap:0;align-items:center}
+.flow-step{width:100%;max-width:700px}
+.flow-arrow{color:var(--text3);font-size:24px;padding:8px 0;text-align:center}
+.flow-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative}
+.flow-box .flow-icon{position:absolute;top:-14px;left:20px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid var(--bg)}
+.flow-box h3{font-size:14px;font-weight:600;margin-bottom:6px;padding-top:4px}
+.flow-box p{font-size:12px;color:var(--text2);line-height:1.6}
+.flow-box .code{font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:10px;color:var(--text2);line-height:1.8;overflow-x:auto}
+.flow-box .code span.k{color:var(--purple)} .flow-box .code span.s{color:var(--green)} .flow-box .code span.c{color:var(--text3)} .flow-box .code span.v{color:var(--blue)} .flow-box .code span.n{color:var(--gold)}
+
+/* GRIDS */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.four-col{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:11px}
+.data-table th{font-family:'JetBrains Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:400}
+.data-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text2);vertical-align:top}
+.data-table tr:hover td{background:var(--bg3)}
+.data-table .mono{font-family:'JetBrains Mono',monospace;font-size:10px}
+
+/* CALLOUT */
+.callout{border-radius:12px;padding:16px 18px;font-size:12px;line-height:1.6;display:flex;gap:12px;align-items:flex-start;margin:16px 0}
+.callout-icon{font-size:18px;flex-shrink:0}
+.callout-title{font-weight:600;margin-bottom:3px}
+
+/* BUG FIX */
+.bug-card{border:2px solid var(--red);background:rgba(239,68,68,0.05);border-radius:16px;padding:24px;margin:20px 0}
+.fix-card{border:2px solid var(--green);background:rgba(34,197,94,0.05);border-radius:16px;padding:24px;margin:20px 0}
+
+/* FOOTER */
+.footer{text-align:center;padding:48px 0 32px;font-size:11px;color:var(--text3);border-top:1px solid var(--border)}
+.footer a{color:var(--strava);text-decoration:none}
+
+@media(max-width:700px){
+  .hero h1{font-size:32px}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .two-col,.three-col{grid-template-columns:1fr}
+  .four-col{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ═══════════════════════════════════════════ HERO ═══ -->
+<div class="hero">
+  <div class="hero-kicker">Technical Documentation</div>
+  <h1>How Data<span>Flows</span></h1>
+  <p class="hero-desc">A plain-English explanation of how ride data gets from Strava to your screen — the complete pipeline from raw GPS data to leaderboards, charts, and coaching tips.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="val" style="color:var(--strava)">3</div><div class="lbl">Pipeline Stages</div></div>
+    <div class="hero-stat"><div class="val" style="color:var(--teal)">1hr</div><div class="lbl">Cache Refresh</div></div>
+    <div class="hero-stat"><div class="val" style="color:var(--blue)">&lt;50ms</div><div class="lbl">Cached Response</div></div>
+    <div class="hero-stat"><div class="val" style="color:var(--gold)">0</div><div class="lbl">Secrets on Device</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ OVERVIEW ═══ -->
+<div class="section">
+  <div class="section-num">01 — The Big Picture</div>
+  <div class="section-title">Three Simple <span style="color:var(--teal)">Steps</span></div>
+  <div class="section-desc">Every piece of data in the app follows this path. No exceptions.</div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-box" style="border-color:rgba(252,76,2,0.3)">
+        <div class="flow-icon" style="background:var(--strava)">🚴</div>
+        <h3 style="color:var(--strava)">Step 1 — Riders Log Rides on Strava</h3>
+        <p>Club members ride their bikes with Strava running (phone or Garmin). When they finish, Strava saves the ride: distance, time, elevation, speed, route. This is completely normal Strava usage — nothing changes for riders.</p>
+        <p style="margin-top:8px">Because all riders are members of the <strong>Desi Cycling Club</strong> on Strava (Club ID: 212760), their rides appear in the club's activity feed automatically.</p>
+      </div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="flow-box" style="border-color:rgba(0,201,167,0.3)">
+        <div class="flow-icon" style="background:var(--teal)">⚡</div>
+        <h3 style="color:var(--teal)">Step 2 — Cloudflare Worker Fetches & Crunches</h3>
+        <p>A serverless JavaScript function running on Cloudflare's edge network calls the Strava API every hour. It fetches all club rides for the current week, groups them by rider, calculates totals and averages, and stores the result in a KV cache.</p>
+        <p style="margin-top:8px"><strong>This is the brain of the system.</strong> The Worker handles authentication, pagination, aggregation, speed calculation, and caching — so the app never touches Strava directly.</p>
+      </div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="flow-box" style="border-color:rgba(59,130,246,0.3)">
+        <div class="flow-icon" style="background:var(--blue)">📱</div>
+        <h3 style="color:var(--blue)">Step 3 — App Displays the Dashboard</h3>
+        <p>The iOS app (or Android PWA) calls <code style="color:var(--teal)">GET /club-data</code> on the Worker. It receives a clean JSON response with per-member stats and individual activities. The app renders 5 tabs: leaderboard, charts, insights, coaching tips, and weekly comparison.</p>
+        <p style="margin-top:8px">If the KV cache has data (it almost always does), the response takes <strong>&lt;50 milliseconds</strong>. No waiting.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ WORKER DETAIL ═══ -->
+<div class="section">
+  <div class="section-num">02 — Inside the Cloudflare Worker</div>
+  <div class="section-title">The <span style="color:var(--strava)">Engine</span> Room</div>
+  <div class="section-desc">What happens when the Worker runs. Every step, every transformation.</div>
+
+  <div class="card">
+    <div class="label">Worker URL</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);margin-bottom:16px">https://dcc-strava.amit-r-kamat.workers.dev</div>
+
+    <div class="label">Endpoints</div>
+    <table class="data-table">
+      <thead><tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td class="mono" style="color:var(--green)">GET</td><td class="mono">/club-data</td><td>Current week stats (default) or historical with <code>?weekOffset=-1</code></td></tr>
+        <tr><td class="mono" style="color:var(--gold)">POST</td><td class="mono">/feature-request</td><td>Submit feature request → creates Jira ticket in SCRUM project</td></tr>
+        <tr><td class="mono" style="color:var(--green)">GET</td><td class="mono">/features</td><td>Live interactive feature dashboard (HTML) — pulls from Jira</td></tr>
+        <tr><td class="mono" style="color:var(--green)">GET</td><td class="mono">/features-api</td><td>Same data as /features but raw JSON</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Token Management -->
+  <div class="card">
+    <div class="label">Step 2a — Token Management</div>
+    <h3 style="font-size:14px;margin-bottom:8px">Getting Permission from Strava</h3>
+    <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">Strava requires an OAuth access token for every API call. Access tokens expire after 6 hours. The Worker manages this automatically:</p>
+    <div class="code">
+      <span class="c">// 1. Check if cached token is still valid (>5 min remaining)</span><br>
+      <span class="k">const</span> expires = <span class="k">await</span> env.STRAVA_KV.get(<span class="s">"strava_access_token_expires"</span>);<br>
+      <span class="k">if</span> (expires - now > <span class="n">300</span>) <span class="k">return</span> cachedToken; <span class="c">// still good</span><br><br>
+      <span class="c">// 2. If expired, refresh using the stored refresh token</span><br>
+      <span class="k">const</span> refreshToken = <span class="k">await</span> env.STRAVA_KV.get(<span class="s">"strava_refresh_token"</span>);<br>
+      <span class="c">// POST to Strava with client_id + client_secret + refresh_token</span><br>
+      <span class="c">// Strava returns: new access_token, new refresh_token, expires_at</span><br><br>
+      <span class="c">// 3. Store ALL new tokens back to KV (Strava rotates refresh tokens)</span><br>
+      <span class="k">await</span> env.STRAVA_KV.put(<span class="s">"strava_access_token"</span>, newToken);<br>
+      <span class="k">await</span> env.STRAVA_KV.put(<span class="s">"strava_refresh_token"</span>, newRefresh);<br>
+      <span class="k">await</span> env.STRAVA_KV.put(<span class="s">"strava_access_token_expires"</span>, expiresAt);
+    </div>
+    <div class="callout" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);margin-top:16px">
+      <div class="callout-icon">🔐</div>
+      <div>
+        <div class="callout-title" style="color:var(--red)">Security: Token Proxy Pattern</div>
+        <div style="font-size:11px;color:var(--text2)">The Strava client_secret and refresh_token are stored as Cloudflare environment secrets. They <strong>never</strong> touch the iOS binary or the Android PWA. The app only calls /club-data — no auth headers needed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fetching -->
+  <div class="card">
+    <div class="label">Step 2b — Fetching Club Activities</div>
+    <h3 style="font-size:14px;margin-bottom:8px">Pulling Rides from Strava</h3>
+    <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">The Worker calls the Strava Club Activities API and pages through all results:</p>
+    <div class="code">
+      <span class="c">// Strava endpoint</span><br>
+      GET /api/v3/clubs/<span class="n">212760</span>/activities?per_page=<span class="n">200</span>&page=<span class="n">1</span><br><br>
+      <span class="c">// Returns (newest first): </span><br>
+      { athlete: { firstname, lastname }, distance: <span class="n">38200</span>, <span class="c">// meters</span><br>
+      &nbsp;&nbsp;moving_time: <span class="n">5400</span>, <span class="c">// seconds</span><br>
+      &nbsp;&nbsp;total_elevation_gain: <span class="n">150</span>, <span class="c">// meters</span><br>
+      &nbsp;&nbsp;type: <span class="s">"Ride"</span>, sport_type: <span class="s">"Ride"</span>,<br>
+      &nbsp;&nbsp;start_date: <span class="s">"2026-03-18T07:30:00Z"</span> }<br><br>
+      <span class="c">// Pagination: keep fetching pages until oldest activity is before weekStart</span><br>
+      <span class="c">// or no more results. Stops early — doesn't fetch the entire club history.</span>
+    </div>
+    <div class="callout" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);margin-top:16px">
+      <div class="callout-icon">⚠️</div>
+      <div>
+        <div class="callout-title" style="color:var(--gold)">Important: What Strava Does NOT Return</div>
+        <div style="font-size:11px;color:var(--text2)">The club activities endpoint does <strong>not</strong> include <code>average_speed</code>. It only returns distance, moving_time, elevation, type, and date. Speed must be calculated manually from distance ÷ time.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aggregation -->
+  <div class="card">
+    <div class="label">Step 2c — Aggregation (The Number Crunching)</div>
+    <h3 style="font-size:14px;margin-bottom:8px">From Raw Rides to Per-Member Stats</h3>
+    <div class="three-col" style="margin:16px 0">
+      <div class="card-sm">
+        <div style="font-size:11px;font-weight:600;color:var(--strava);margin-bottom:6px">1. Filter to Week</div>
+        <div style="font-size:11px;color:var(--text2)">Only activities between Monday 00:00 UTC and Sunday 23:59 UTC of the target week are included.</div>
+      </div>
+      <div class="card-sm">
+        <div style="font-size:11px;font-weight:600;color:var(--teal);margin-bottom:6px">2. Group by Rider</div>
+        <div style="font-size:11px;color:var(--text2)">Activities grouped by "<code>Firstname L.</code>" format. Each member gets a running total of distance, elevation, time, and ride count.</div>
+      </div>
+      <div class="card-sm">
+        <div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:6px">3. Calculate Averages</div>
+        <div style="font-size:11px;color:var(--text2)">Average speed is <strong>weighted by distance</strong> — a 100km ride counts more than a 5km ride. This prevents short rides from skewing the average.</div>
+      </div>
+    </div>
+
+    <div class="label" style="margin-top:16px">Speed Calculation (The Fix)</div>
+    <div class="code">
+      <span class="c">// Per-activity speed: calculated from raw distance and time</span><br>
+      <span class="k">const</span> movingSec = act.moving_time ?? <span class="n">0</span>;<br>
+      <span class="k">const</span> speedKmh = movingSec > <span class="n">0</span><br>
+      &nbsp;&nbsp;? (act.distance / movingSec) * <span class="n">3.6</span> &nbsp;&nbsp;<span class="c">// meters/sec → km/h</span><br>
+      &nbsp;&nbsp;: <span class="n">0</span>;<br><br>
+      <span class="c">// Per-member weighted average speed:</span><br>
+      <span class="c">// Sum of (speed × distance) for all rides, divided by total distance</span><br>
+      <span class="c">// Example: 2 rides at 25km/h (40km) and 15km/h (10km)</span><br>
+      <span class="c">//   = (25×40 + 15×10) / (40+10) = 1150/50 = 23.0 km/h</span><br>
+      <span class="c">//   (not simple average of 20.0 — longer rides weigh more)</span>
+    </div>
+  </div>
+
+  <!-- Caching -->
+  <div class="card">
+    <div class="label">Step 2d — KV Caching</div>
+    <h3 style="font-size:14px;margin-bottom:8px">Why the App Feels Instant</h3>
+    <div class="two-col" style="margin:16px 0">
+      <div class="card-sm">
+        <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:6px">Cache Key</div>
+        <div style="font-size:11px;color:var(--text2)"><code>club_data_week_2026-03-23</code> — Monday's date as the key. Each week gets its own cache entry.</div>
+      </div>
+      <div class="card-sm">
+        <div style="font-size:11px;font-weight:600;color:var(--gold);margin-bottom:6px">Cache TTL</div>
+        <div style="font-size:11px;color:var(--text2)"><strong>1 hour</strong>. A cron trigger runs every hour to pre-warm the cache. First request after expiry: ~2s. All subsequent: <strong>&lt;50ms</strong> from nearest edge.</div>
+      </div>
+    </div>
+    <div class="code">
+      <span class="c">// Cache hit path (fast — &lt;50ms)</span><br>
+      <span class="k">const</span> cached = <span class="k">await</span> env.STRAVA_KV.get(cacheKey);<br>
+      <span class="k">if</span> (cached) <span class="k">return</span> <span class="k">new</span> Response(cached, { headers: { <span class="s">"X-Cache": "HIT"</span> } });<br><br>
+      <span class="c">// Cache miss path (slow — ~2s, calls Strava)</span><br>
+      <span class="k">const</span> payload = <span class="k">await</span> fetchAndCacheWeek(env, weekOffset);<br>
+      <span class="k">await</span> env.STRAVA_KV.put(cacheKey, JSON.stringify(payload), { expirationTtl: <span class="n">3600</span> });
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ WEEK COMPARISON ═══ -->
+<div class="section">
+  <div class="section-num">03 — Week-on-Week Comparison</div>
+  <div class="section-title">How Trend <span style="color:var(--gold)">Arrows</span> Work</div>
+  <div class="section-desc">The table shows whether each rider improved or declined compared to last week. Here's the logic.</div>
+
+  <div class="card">
+    <div class="label">The Two-Week Data Strategy</div>
+    <p style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px">The Worker fetches <strong>one week at a time</strong>. The iOS app uses a local disk cache (<code>WeeklyCache.swift</code>) to remember previous weeks:</p>
+    <div class="four-col" style="margin-bottom:16px">
+      <div class="card-sm" style="text-align:center;border-color:rgba(59,130,246,0.25)">
+        <div style="font-size:20px;margin-bottom:4px">📡</div>
+        <div style="font-size:10px;font-weight:600;color:var(--blue)">This Week</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px">Live from Worker</div>
+      </div>
+      <div class="card-sm" style="text-align:center;border-color:rgba(245,158,11,0.25)">
+        <div style="font-size:20px;margin-bottom:4px">💾</div>
+        <div style="font-size:10px;font-weight:600;color:var(--gold)">Last Week</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px">Disk cache</div>
+      </div>
+      <div class="card-sm" style="text-align:center;border-color:rgba(0,201,167,0.25)">
+        <div style="font-size:20px;margin-bottom:4px">🔄</div>
+        <div style="font-size:10px;font-weight:600;color:var(--teal)">Compare</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px">Calculate trend</div>
+      </div>
+      <div class="card-sm" style="text-align:center;border-color:rgba(34,197,94,0.25)">
+        <div style="font-size:20px;margin-bottom:4px">📊</div>
+        <div style="font-size:10px;font-weight:600;color:var(--green)">Display</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px">Arrow + colour</div>
+      </div>
+    </div>
+
+    <div class="label">Trend Direction Rules</div>
+    <table class="data-table">
+      <thead><tr><th>Arrow</th><th>Meaning</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td style="font-size:18px;color:var(--green)">↑</td><td>Improvement</td><td class="mono">thisWeekKM > lastWeekKM × 1.10 <span style="color:var(--text3)">(>10% increase)</span></td></tr>
+        <tr><td style="font-size:18px;color:var(--red)">↓</td><td>Decline</td><td class="mono">thisWeekKM < lastWeekKM × 0.90 <span style="color:var(--text3)">(>10% decrease)</span></td></tr>
+        <tr><td style="font-size:18px;color:var(--gold)">→</td><td>Steady</td><td class="mono">Within ±10% of last week</td></tr>
+        <tr><td style="font-size:18px;color:var(--purple)">★</td><td>New Rider</td><td class="mono">No previous week data available</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout" style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);margin-top:16px">
+      <div class="callout-icon">💡</div>
+      <div>
+        <div class="callout-title" style="color:var(--blue)">Cache Lifecycle</div>
+        <div style="font-size:11px;color:var(--text2)">When the app fetches this week's data, it saves a <code>MemberSnapshot</code> to disk. Next Monday, that snapshot becomes the "previous week" baseline. Snapshots expire after 14 days. This means trend arrows are always accurate — even if the user was offline last week.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ SPEED BUG ═══ -->
+<div class="section">
+  <div class="section-num">04 — Speed Calculation Fix (March 2026)</div>
+  <div class="section-title">The <span style="color:var(--red)">0.0 km/h</span> Bug</div>
+  <div class="section-desc">A critical bug where all speed values showed 0.0 km/h — found and fixed on 27 March 2026.</div>
+
+  <div class="bug-card">
+    <div class="label" style="color:var(--red)">The Bug</div>
+    <h3 style="font-size:14px;color:var(--red);margin-bottom:8px">Every rider's speed was 0.0 km/h</h3>
+    <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">The Worker code assumed Strava's club activities endpoint returns an <code>average_speed</code> field. <strong>It does not.</strong> The Strava /clubs/{id}/activities endpoint returns a limited set of fields — distance, moving_time, elevation, type, and date. No speed.</p>
+    <div class="code">
+      <span class="c">// BROKEN — average_speed is always undefined</span><br>
+      <span class="k">const</span> speedKmh = (act.<span style="color:var(--red);text-decoration:line-through">average_speed</span> ?? <span class="n">0</span>) * <span class="n">3.6</span>;<br>
+      <span class="c">// Result: (undefined ?? 0) * 3.6 = 0 — every single time</span>
+    </div>
+  </div>
+
+  <div class="fix-card">
+    <div class="label" style="color:var(--green)">The Fix</div>
+    <h3 style="font-size:14px;color:var(--green);margin-bottom:8px">Calculate speed from distance and time</h3>
+    <p style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">Speed = distance ÷ time. Both fields are always available. The fix is simple and bulletproof:</p>
+    <div class="code">
+      <span class="c">// FIXED — calculate from fields that always exist</span><br>
+      <span class="k">const</span> movingSec = act.moving_time ?? <span class="n">0</span>;<br>
+      <span class="k">const</span> speedKmh = movingSec > <span class="n">0</span><br>
+      &nbsp;&nbsp;? (act.distance / movingSec) * <span class="n">3.6</span><br>
+      &nbsp;&nbsp;: <span class="n">0</span>;<br><br>
+      <span class="c">// Example: 38,200m in 5,400s</span><br>
+      <span class="c">// = (38200 / 5400) * 3.6 = 7.07 * 3.6 = 25.5 km/h ✓</span>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+      <span class="tag" style="background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,0.2)">Deployed 27 Mar 2026</span>
+      <span class="tag" style="background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,0.2)">Worker v3e20e80d</span>
+      <span class="tag" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,158,11,0.2)">KV cache refreshes hourly</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">Before vs After</div>
+    <table class="data-table">
+      <thead><tr><th>Rider</th><th>Before (Bug)</th><th>After (Fix)</th><th>Distance</th></tr></thead>
+      <tbody>
+        <tr><td>Amit K.</td><td class="mono" style="color:var(--red)">0.0 km/h</td><td class="mono" style="color:var(--green)">21.8 km/h</td><td class="mono">351.8 km</td></tr>
+        <tr><td>Harshal K.</td><td class="mono" style="color:var(--red)">0.0 km/h</td><td class="mono" style="color:var(--green)">26.4 km/h</td><td class="mono">114.8 km</td></tr>
+        <tr><td>Avinash R.</td><td class="mono" style="color:var(--red)">0.0 km/h</td><td class="mono" style="color:var(--green)">24.4 km/h</td><td class="mono">221.1 km</td></tr>
+        <tr><td>Sanjay L.</td><td class="mono" style="color:var(--red)">0.0 km/h</td><td class="mono" style="color:var(--green)">19.7 km/h</td><td class="mono">254.0 km</td></tr>
+        <tr><td>Ramesh K.</td><td class="mono" style="color:var(--red)">0.0 km/h</td><td class="mono" style="color:var(--green)">16.9 km/h</td><td class="mono">156.7 km</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ JSON RESPONSE ═══ -->
+<div class="section">
+  <div class="section-num">05 — Response Format</div>
+  <div class="section-title">What the <span style="color:var(--purple)">App Receives</span></div>
+  <div class="section-desc">The exact JSON structure returned by GET /club-data.</div>
+
+  <div class="card">
+    <div class="label">GET /club-data Response</div>
+    <div class="code" style="font-size:11px;line-height:2">
+      {<br>
+      &nbsp;&nbsp;<span class="s">"lastFetchedAt"</span>: <span class="s">"2026-03-27T10:00:00.000Z"</span>,<br>
+      &nbsp;&nbsp;<span class="s">"weekLabel"</span>: <span class="s">"w/c 23 Mar"</span>,<br>
+      &nbsp;&nbsp;<span class="s">"weekStart"</span>: <span class="s">"2026-03-23"</span>, &nbsp;<span class="c">// Monday</span><br>
+      &nbsp;&nbsp;<span class="s">"weekEnd"</span>: <span class="s">"2026-03-29"</span>, &nbsp;&nbsp;&nbsp;<span class="c">// Sunday</span><br>
+      &nbsp;&nbsp;<span class="s">"memberCount"</span>: <span class="n">10</span>,<br>
+      &nbsp;&nbsp;<span class="s">"totalActivities"</span>: <span class="n">49</span>,<br>
+      &nbsp;&nbsp;<span class="s">"members"</span>: [{<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"name"</span>: <span class="s">"Amit K."</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"totalDistance"</span>: <span class="n">351.8</span>, &nbsp;&nbsp;&nbsp;<span class="c">// km</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"totalElevation"</span>: <span class="n">2437</span>, &nbsp;&nbsp;<span class="c">// meters</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"totalMovingTime"</span>: <span class="n">58020</span>, <span class="c">// seconds</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"rideCount"</span>: <span class="n">9</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"avgSpeed"</span>: <span class="n">21.8</span>, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c">// km/h (weighted average)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"movingTimeFormatted"</span>: <span class="s">"16h 7m"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"activities"</span>: [{<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"name"</span>: <span class="s">"Morning Ride"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"distance"</span>: <span class="n">38.2</span>, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c">// km</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"movingTime"</span>: <span class="n">5400</span>, &nbsp;&nbsp;&nbsp;<span class="c">// seconds</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"elevationGain"</span>: <span class="n">150</span>, &nbsp;<span class="c">// meters</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"averageSpeed"</span>: <span class="n">25.5</span>, &nbsp;<span class="c">// km/h (calculated)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"type"</span>: <span class="s">"Ride"</span>,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"sportType"</span>: <span class="s">"Ride"</span>, &nbsp;&nbsp;<span class="c">// Road, MountainBikeRide, GravelRide, EBikeRide, VirtualRide</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="s">"startDate"</span>: <span class="s">"2026-03-25T07:30:00Z"</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;}]<br>
+      &nbsp;&nbsp;}]<br>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ LINKS ═══ -->
+<div class="section">
+  <div class="section-num">06 — Quick Links</div>
+  <div class="section-title">Where to <span style="color:var(--teal)">Go</span></div>
+
+  <div class="three-col">
+    <a href="https://dcc-strava.amit-r-kamat.workers.dev/features" target="_blank" style="text-decoration:none">
+      <div class="card-sm" style="border-color:rgba(34,197,94,0.25);cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:6px">📊</div>
+        <div style="font-size:11px;font-weight:600;color:var(--green)">Feature Dashboard</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">Live from Jira</div>
+      </div>
+    </a>
+    <a href="dcc-app.html" style="text-decoration:none">
+      <div class="card-sm" style="border-color:rgba(59,130,246,0.25);cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:6px">📱</div>
+        <div style="font-size:11px;font-weight:600;color:var(--blue)">Android PWA</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">Full app in browser</div>
+      </div>
+    </a>
+    <a href="https://www.kamat.co.uk" target="_blank" style="text-decoration:none">
+      <div class="card-sm" style="border-color:rgba(168,85,247,0.25);cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:6px">🌐</div>
+        <div style="font-size:11px;font-weight:600;color:var(--purple)">Portfolio</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:2px">kamat.co.uk</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<div class="footer">
+  <a href="index.html">Architecture Spec</a> · <a href="feature-dashboard.html">Feature Dashboard</a> · <a href="blog-and-portfolio.html">Blog</a> · <a href="dcc-app.html">Android PWA</a><br>
+  Desi Cycling Club · DCC Weekly Activities v3.0 · March 2026
+</div>
+
+</body>
+</html>
