@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCC Weekly Activities — Feature Dashboard</title>
+<style>
+  :root {
+    --orange: #FF6B00;
+    --orange-light: #FF8C33;
+    --green: #34C759;
+    --green-bg: #E8F8ED;
+    --blue: #007AFF;
+    --blue-bg: #E5F0FF;
+    --red: #FF3B30;
+    --red-bg: #FFECEB;
+    --grey: #8E8E93;
+    --grey-bg: #F2F2F7;
+    --dark: #1C1C1E;
+    --card-bg: #FFFFFF;
+    --body-bg: #F5F5F7;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background: var(--body-bg);
+    color: var(--dark);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 50%, #FF6B00 150%);
+    color: #fff;
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .hero .subtitle {
+    font-size: 1rem;
+    opacity: 0.75;
+    margin-bottom: 24px;
+  }
+  .hero .version-badge {
+    display: inline-block;
+    background: var(--orange);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* ── Stats strip ────────────────────────────────────────── */
+  .stats-strip {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-size: 1.75rem;
+    font-weight: 700;
+    display: block;
+  }
+  .stat-num.live    { color: var(--green); }
+  .stat-num.planned { color: var(--blue); }
+  .stat-num.disc    { color: var(--red); }
+  .stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+  }
+
+  /* ── Container ──────────────────────────────────────────── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+  }
+
+  /* ── Search & filters ───────────────────────────────────── */
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--body-bg);
+    padding: 16px 0 12px;
+  }
+  .search-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--grey);
+  }
+  .search-input {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    border: 2px solid #E5E5EA;
+    border-radius: 12px;
+    font-size: 1rem;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--orange); }
+  .search-input::placeholder { color: #C7C7CC; }
+
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #D1D1D6;
+    background: #fff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .filter-btn.active {
+    background: var(--dark);
+    color: #fff;
+    border-color: var(--dark);
+  }
+  .filter-btn .count {
+    display: inline-block;
+    background: rgba(0,0,0,0.08);
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 4px;
+  }
+  .filter-btn.active .count { background: rgba(255,255,255,0.2); }
+
+  /* ── Category sections ──────────────────────────────────── */
+  .category {
+    margin-top: 28px;
+  }
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .category-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .category-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    flex: 1;
+  }
+  .category-count {
+    font-size: 0.8rem;
+    color: var(--grey);
+    font-weight: 500;
+  }
+  .chevron {
+    width: 20px;
+    height: 20px;
+    color: var(--grey);
+    transition: transform 0.25s;
+  }
+  .category.collapsed .chevron { transform: rotate(-90deg); }
+  .category.collapsed .feature-list { display: none; }
+
+  /* ── Feature cards ──────────────────────────────────────── */
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .feature-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+    cursor: default;
+  }
+  .feature-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .feature-card.hidden { display: none; }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .feature-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    flex: 1;
+  }
+  .status-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .status-badge.live     { background: var(--green-bg); color: #1B8A38; }
+  .status-badge.planned  { background: var(--blue-bg);  color: #0055CC; }
+  .status-badge.discarded { background: var(--red-bg);  color: #CC1A11; }
+
+  .feature-desc {
+    font-size: 0.85rem;
+    color: #636366;
+    margin-bottom: 8px;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .meta-tag {
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--grey-bg);
+    color: #636366;
+  }
+  .meta-tag.scrum { background: #FFF3E0; color: #E65100; }
+  .meta-tag.tab   { background: #E8EAF6; color: #283593; }
+  .meta-tag.platform { background: #F3E5F5; color: #6A1B9A; }
+
+  /* ── No results ─────────────────────────────────────────── */
+  .no-results {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--grey);
+  }
+  .no-results .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .no-results p { font-size: 1rem; }
+
+  /* ── Footer ─────────────────────────────────────────────── */
+  .footer {
+    text-align: center;
+    padding: 32px 16px;
+    font-size: 0.8rem;
+    color: var(--grey);
+  }
+  .footer a { color: var(--orange); text-decoration: none; }
+
+  /* ── Responsive ─────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5rem; }
+    .stats-strip { gap: 20px; }
+    .stat-num { font-size: 1.4rem; }
+    .feature-card { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- Hero                                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="version-badge">v3.0 — March 2026</div>
+  <h1>DCC Weekly Activities</h1>
+  <p class="subtitle">Feature Dashboard — search, explore, and track what's live, planned, and shelved</p>
+  <div class="stats-strip" id="statsStrip">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- Main content                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="container">
+  <div class="controls">
+    <div class="search-wrap">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="8.5" cy="8.5" r="6"/>
+        <line x1="13" y1="13" x2="18" y2="18"/>
+      </svg>
+      <input class="search-input" id="search" type="text" placeholder="Search features, tabs, SCRUM tickets...">
+    </div>
+    <div class="filter-bar" id="filterBar">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <div id="featureContainer"></div>
+  <div class="no-results" id="noResults" style="display:none;">
+    <div class="icon">&#x1F50D;</div>
+    <p>No features match your search.</p>
+  </div>
+</div>
+
+<div class="footer">
+  Built for <a href="#">Desi Cycling Club</a> &mdash; powered by Cloudflare Workers &amp; SwiftUI
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- Feature Data                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script>
+const FEATURES = [
+  // ── Authentication ──────────────────────────────────────
+  {
+    category: "Authentication",
+    icon: "&#x1F512;",
+    iconBg: "#FFE0B2",
+    features: [
+      {
+        name: "Club Code Login",
+        desc: "Enter club code (DCC2026) and your name to access the app. No Strava OAuth needed.",
+        status: "live",
+        tags: ["Tier 1", "ClubCodeLoginView"],
+        tab: "Login",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Face ID / Touch ID Gate",
+        desc: "Biometric lock on every launch after first login. Protects dashboard access.",
+        status: "live",
+        tags: ["Tier 1", "BiometricAuth"],
+        tab: "Login",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Secure Keychain Storage",
+        desc: "Club code and auth tokens stored in iOS Keychain — never in UserDefaults or plain text.",
+        status: "live",
+        tags: ["Tier 1", "KeychainService"],
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Profile Avatar & Logout",
+        desc: "Tap your initial avatar (top-right) to access profile options and log out.",
+        status: "live",
+        tags: ["RootView"],
+        tab: "All tabs",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Strava OAuth Login",
+        desc: "Direct Strava OAuth flow for individual athlete authentication. Replaced by club code approach.",
+        status: "discarded",
+        tags: ["Legacy", "UserAuthService"],
+        reason: "Club code approach is simpler and doesn't require individual Strava accounts."
+      }
+    ]
+  },
+
+  // ── Dashboard — Ride (Tab 1) ────────────────────────────
+  {
+    category: "Ride (Main Tab)",
+    icon: "&#x1F6B4;",
+    iconBg: "#C8E6C9",
+    features: [
+      {
+        name: "Weekly Report Table",
+        desc: "Full stats table for every rider: distance, rides, avg speed, elevation, trend arrows, previous week comparison. Scroll horizontally for all columns.",
+        status: "live",
+        tags: ["WeeklyReportTableView", "MemberStatsTableView"],
+        tab: "Ride",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Animated Club Totals",
+        desc: "Counters at the top showing total club distance, rides, and active riders — numbers animate on load.",
+        status: "live",
+        tags: ["ProfessionalDashboardView"],
+        tab: "Ride",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Week Picker Navigation",
+        desc: "Navigate between weeks (current + up to 4 weeks back) using left/right arrows around the week label.",
+        status: "live",
+        tags: ["WeeklyDashboardView"],
+        tab: "Ride",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Trend Arrows (vs Last Week)",
+        desc: "Up/down/flat arrows per rider showing >10% increase, >10% decrease, or steady compared to previous week.",
+        status: "live",
+        tags: ["MemberStats"],
+        tab: "Ride",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Ride Type Filter Bar",
+        desc: "Filter activities by ride type: All, Road, Mountain Bike, Gravel, E-Bike, Virtual. Uses Strava sport_type field.",
+        status: "live",
+        tags: ["SCRUM-54", "RideTypeFilterBar", "RideType"],
+        tab: "Ride",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Strava Branding Badge",
+        desc: "'Powered by Strava' badge with official branding, required by Strava API terms.",
+        status: "live",
+        tags: ["SCRUM-54", "StravaBrandingBadge"],
+        tab: "Ride",
+        platform: "iOS / iPad"
+      }
+    ]
+  },
+
+  // ── Overview (Tab 2) ────────────────────────────────────
+  {
+    category: "Overview (Tab 2)",
+    icon: "&#x1F4CA;",
+    iconBg: "#BBDEFB",
+    features: [
+      {
+        name: "My Performance Rings",
+        desc: "4 animated rings showing your distance, speed, elevation, and ride count relative to the club. Auto-identifies you by login name.",
+        status: "live",
+        tags: ["JustMyStatsView"],
+        tab: "Overview",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Strength Bars",
+        desc: "Visual bars showing where you rank in each metric vs the club average.",
+        status: "live",
+        tags: ["JustMyStatsView"],
+        tab: "Overview",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Compare With Any Rider",
+        desc: "Side-by-side comparison with any rider you choose from a dropdown selector.",
+        status: "live",
+        tags: ["JustMyStatsView"],
+        tab: "Overview",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Me vs Top 3",
+        desc: "Your stats compared to the top 3 riders in a compact card.",
+        status: "live",
+        tags: ["MeVsTop3View"],
+        tab: "Overview",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Performance Zones",
+        desc: "Best and worst performers across 4 metrics with animated progress bars. Green = top, red = room for improvement.",
+        status: "live",
+        tags: ["PerformanceZonesView"],
+        tab: "Overview",
+        platform: "iOS / iPad"
+      }
+    ]
+  },
+
+  // ── Leaderboard (Tab 3) ─────────────────────────────────
+  {
+    category: "Leaderboard (Tab 3)",
+    icon: "&#x1F3C6;",
+    iconBg: "#FFF9C4",
+    features: [
+      {
+        name: "Club Overview Cards",
+        desc: "4 summary cards at the top: Total Distance, Total Rides, Active Riders, Avg per Rider.",
+        status: "live",
+        tags: ["LeaderboardView"],
+        tab: "Leaderboard",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Ranked Rider List",
+        desc: "All riders ranked by total distance with medal badges for top 3. Each row shows rank, name, distance, rides, avg speed, elevation.",
+        status: "live",
+        tags: ["LeaderboardView"],
+        tab: "Leaderboard",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Rider Drill-Down",
+        desc: "Tap any rider row to open full analysis: charts, coaching tips, celebration card.",
+        status: "live",
+        tags: ["RiderAnalysisView"],
+        tab: "Leaderboard",
+        platform: "iOS / iPad"
+      }
+    ]
+  },
+
+  // ── Insights (Tab 4) ───────────────────────────────────
+  {
+    category: "Insights (Tab 4)",
+    icon: "&#x1F4A1;",
+    iconBg: "#E1BEE7",
+    features: [
+      {
+        name: "Rider Chip Selector",
+        desc: "Horizontal scrollable pills to pick which rider to analyse. Scroll left/right, tap a name.",
+        status: "live",
+        tags: ["InsightsView", "InsightsViewModel"],
+        tab: "Insights",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Celebration Card",
+        desc: "Personalised hero card with rank badge, distance, rides, elevation, and motivational message.",
+        status: "live",
+        tags: ["CelebrationCardView"],
+        tab: "Insights",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Confetti Burst Animation",
+        desc: "Animated particle celebration effect triggers automatically when you select a rider.",
+        status: "live",
+        tags: ["InsightsView"],
+        tab: "Insights",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "View Full Analysis Link",
+        desc: "Opens the full rider analysis with charts and coaching from the celebration card.",
+        status: "live",
+        tags: ["InsightsView", "RiderAnalysisView"],
+        tab: "Insights",
+        platform: "iOS / iPad"
+      }
+    ]
+  },
+
+  // ── Analysis (Tab 5) ───────────────────────────────────
+  {
+    category: "Analysis (Tab 5)",
+    icon: "&#x1F9EA;",
+    iconBg: "#B2DFDB",
+    features: [
+      {
+        name: "Distance Bar Chart",
+        desc: "Horizontal bars comparing all riders — selected rider highlighted in orange.",
+        status: "live",
+        tags: ["DistanceBarChart"],
+        tab: "Analysis",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Speed vs Elevation Scatter",
+        desc: "Scatter plot with 4 quadrants: Fast & Climbing, Steady Climber, Fast & Flat, Endurance Base. Your dot is the largest.",
+        status: "live",
+        tags: ["SpeedElevationScatter"],
+        tab: "Analysis",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Radar Chart (5-axis)",
+        desc: "Spider chart: Distance, Speed, Elevation, Rides, Consistency — your values vs club average (dashed line).",
+        status: "live",
+        tags: ["RadarChartView"],
+        tab: "Analysis",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "AI Coaching Tips",
+        desc: "AI-generated tips showing your gaps and how to close them, with What-If scenarios. Max 2 tips per rider.",
+        status: "live",
+        tags: ["CoachingTipCard", "WhatIfEngine"],
+        tab: "Analysis",
+        platform: "iOS / iPad"
+      }
+    ]
+  },
+
+  // ── Feature Request ─────────────────────────────────────
+  {
+    category: "Feature Request System",
+    icon: "&#x1F4AC;",
+    iconBg: "#FFE0B2",
+    features: [
+      {
+        name: "Floating Lightbulb Button",
+        desc: "Orange FAB on every tab (bottom-right) to submit feature ideas.",
+        status: "live",
+        tags: ["SCRUM-55", "FeatureRequestFAB"],
+        tab: "All tabs",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Text Input (10-1000 chars)",
+        desc: "Type your feature request in a text field with character counter and validation.",
+        status: "live",
+        tags: ["SCRUM-55", "FeatureRequestView"],
+        tab: "All tabs",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Voice Dictation Input",
+        desc: "Tap the microphone icon to dictate your request. Uses on-device Speech framework — edit before submitting.",
+        status: "live",
+        tags: ["SCRUM-55", "SpeechRecognitionManager"],
+        tab: "All tabs",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Jira Integration",
+        desc: "Submissions go directly to the SCRUM project Jira backlog via the Cloudflare Worker POST /feature-request endpoint.",
+        status: "live",
+        tags: ["SCRUM-55", "FeatureRequestService"],
+        tab: "All tabs",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "60-Second Rate Limit",
+        desc: "Cooldown timer between submissions to prevent spam. Button shows countdown.",
+        status: "live",
+        tags: ["SCRUM-55"],
+        tab: "All tabs",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Offline Queue",
+        desc: "Feature requests submitted offline are queued locally and auto-sent when connectivity returns. Banner shows pending count.",
+        status: "live",
+        tags: ["SCRUM-55", "FeatureRequestService"],
+        tab: "All tabs",
+        platform: "iOS / iPad"
+      }
+    ]
+  },
+
+  // ── Data Pipeline ───────────────────────────────────────
+  {
+    category: "Data Pipeline",
+    icon: "&#x2601;&#xFE0F;",
+    iconBg: "#B3E5FC",
+    features: [
+      {
+        name: "Cloudflare Worker /club-data",
+        desc: "Serverless endpoint fetches Strava club activities, aggregates per-member stats, and returns JSON. Cached in KV for performance.",
+        status: "live",
+        tags: ["Tier 2", "CloudDataFetcher"],
+        platform: "Backend"
+      },
+      {
+        name: "Sport Type Enrichment",
+        desc: "Worker returns sport_type field (Ride, MountainBikeRide, GravelRide, EBikeRide, VirtualRide) enabling client-side ride type filtering.",
+        status: "live",
+        tags: ["SCRUM-54", "CloudDataFetcher"],
+        platform: "Backend"
+      },
+      {
+        name: "Weekly Cache (Disk)",
+        desc: "On-device disk cache stores the last successful week's data. Shown when offline or on launch before network completes.",
+        status: "live",
+        tags: ["Tier 2", "WeeklyCache"],
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Pull-to-Refresh",
+        desc: "Drag down on the dashboard to trigger a fresh data fetch from the Cloudflare Worker.",
+        status: "live",
+        tags: ["WeeklyDashboardView"],
+        tab: "All tabs",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "BOT_REFRESH_TOKEN Fallback",
+        desc: "Worker falls back to env secret if KV has no refresh token — self-seeds KV on first use for zero-touch deployment.",
+        status: "live",
+        tags: ["Worker"],
+        platform: "Backend"
+      }
+    ]
+  },
+
+  // ── Admin & Coach ───────────────────────────────────────
+  {
+    category: "Admin & Coach Tools",
+    icon: "&#x1F6E0;&#xFE0F;",
+    iconBg: "#FFCCBC",
+    features: [
+      {
+        name: "Worst Performer Analysis",
+        desc: "Weighted composite score (Distance 35%, Rides 20%, Elevation 20%, Moving Time 10%, Speed 10%, Suffer 5%). Shows stats grid, verdict, and coaching suggestions.",
+        status: "live",
+        tags: ["WorstPerformerView"],
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Performance Stats Dashboard",
+        desc: "Chronological log of app performance events (network, view render), category bar charts, mini stat cards with animated counters.",
+        status: "live",
+        tags: ["Profile Menu"],
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Worker KV Dashboard",
+        desc: "Admin view to inspect Cloudflare KV store contents — token status, cache age, data freshness.",
+        status: "live",
+        tags: ["WorkerKVDashboardView"],
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Apple TV Token Sharing",
+        desc: "Copy auth token as JSON to clipboard for pasting into the tvOS companion app.",
+        status: "live",
+        tags: ["Profile Menu"],
+        platform: "iOS / iPad / tvOS"
+      }
+    ]
+  },
+
+  // ── iPad Layout ─────────────────────────────────────────
+  {
+    category: "iPad & Adaptive Layout",
+    icon: "&#x1F4F1;",
+    iconBg: "#D1C4E9",
+    features: [
+      {
+        name: "Sidebar Navigation",
+        desc: "On iPad or wide Split View, tabs appear in a sidebar-adaptable layout with 4 sections.",
+        status: "live",
+        tags: ["AdaptiveDashboardRouter"],
+        platform: "iPad"
+      },
+      {
+        name: "Two-Column Main Tab",
+        desc: "Left 2/3: podium (top 3) + full ranked table. Right 1/3: best ride card + highlight stats.",
+        status: "live",
+        tags: ["AdaptiveDashboardRouter"],
+        platform: "iPad"
+      },
+      {
+        name: "Hero Strip (4 Metrics)",
+        desc: "4 club-wide numbers across the top in a horizontal strip layout.",
+        status: "live",
+        tags: ["AdaptiveDashboardRouter"],
+        platform: "iPad"
+      },
+      {
+        name: "Live Resize (Split View / Stage Manager)",
+        desc: "Layout adapts dynamically when resizing in Split View or Stage Manager.",
+        status: "live",
+        tags: ["AdaptiveDashboardRouter"],
+        platform: "iPad"
+      }
+    ]
+  },
+
+  // ── Planned Features ────────────────────────────────────
+  {
+    category: "Planned Features",
+    icon: "&#x1F6A7;",
+    iconBg: "#BBDEFB",
+    features: [
+      {
+        name: "Multi-Week Trend Charts",
+        desc: "Line charts showing distance and ride count trends across 4-8 weeks per rider.",
+        status: "planned",
+        tags: ["Backlog"],
+        tab: "Analysis",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Push Notifications (Weekly Summary)",
+        desc: "Monday morning push notification with your previous week's summary and club rank.",
+        status: "planned",
+        tags: ["Backlog"],
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Club Challenges / Goals",
+        desc: "Set weekly or monthly distance/elevation goals for the whole club with progress tracking.",
+        status: "planned",
+        tags: ["Backlog"],
+        tab: "Leaderboard",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Apple Watch Companion",
+        desc: "Glanceable complications showing your weekly distance and club rank on Apple Watch.",
+        status: "planned",
+        tags: ["Backlog"],
+        platform: "watchOS"
+      },
+      {
+        name: "Dark Mode Toggle",
+        desc: "Manual dark/light mode toggle in addition to system-level automatic switching.",
+        status: "planned",
+        tags: ["Backlog"],
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Segment Leaderboards",
+        desc: "Compare rider times on popular local Strava segments ridden by club members.",
+        status: "planned",
+        tags: ["Backlog"],
+        tab: "Leaderboard",
+        platform: "iOS / iPad"
+      },
+      {
+        name: "Export to PDF / Share Card",
+        desc: "Generate a shareable image or PDF of your weekly stats to post on social media.",
+        status: "planned",
+        tags: ["Backlog"],
+        platform: "iOS / iPad"
+      }
+    ]
+  },
+
+  // ── Discarded / Shelved ─────────────────────────────────
+  {
+    category: "Discarded / Shelved",
+    icon: "&#x1F5D1;&#xFE0F;",
+    iconBg: "#FFCDD2",
+    features: [
+      {
+        name: "Individual Strava OAuth Login",
+        desc: "Each user would authenticate with their own Strava account. Replaced by club code approach — simpler, no individual account needed.",
+        status: "discarded",
+        tags: ["Legacy"],
+        reason: "Club code is simpler and removes the dependency on individual Strava accounts."
+      },
+      {
+        name: "In-App Strava Activity Upload",
+        desc: "Allow users to upload rides directly from the app. Strava's own app handles this better.",
+        status: "discarded",
+        tags: ["Rejected"],
+        reason: "Out of scope — Strava's app is purpose-built for recording and uploading rides."
+      },
+      {
+        name: "Chat / Messaging Between Riders",
+        desc: "In-app messaging or group chat for club members.",
+        status: "discarded",
+        tags: ["Rejected"],
+        reason: "Club already uses WhatsApp. Duplicating social features adds complexity without value."
+      },
+      {
+        name: "Route Maps / GPS Traces",
+        desc: "Display ride routes on a map within the app.",
+        status: "discarded",
+        tags: ["Rejected"],
+        reason: "Strava already provides excellent map views. Duplicating would require significant MapKit work for minimal benefit."
+      },
+      {
+        name: "Calorie / Power Tracking",
+        desc: "Track calories burned and power output metrics in the dashboard.",
+        status: "discarded",
+        tags: ["Rejected"],
+        reason: "Data not consistently available across all riders. Some use power meters, most don't — creates misleading comparisons."
+      },
+      {
+        name: "Social Media Integration",
+        desc: "Auto-post achievements to Twitter/Instagram/Facebook.",
+        status: "discarded",
+        tags: ["Rejected"],
+        reason: "Privacy concerns and API costs. Members can screenshot and share manually."
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// Render
+// ═══════════════════════════════════════════════════════════
+
+const container   = document.getElementById("featureContainer");
+const searchInput = document.getElementById("search");
+const filterBar   = document.getElementById("filterBar");
+const noResults   = document.getElementById("noResults");
+const statsStrip  = document.getElementById("statsStrip");
+
+let activeFilter = "all";
+
+// Count totals
+function countByStatus(status) {
+  return FEATURES.reduce((sum, cat) =>
+    sum + cat.features.filter(f => status === "all" || f.status === status).length, 0);
+}
+
+// Stats strip
+statsStrip.innerHTML = `
+  <div class="stat-item"><span class="stat-num live">${countByStatus("live")}</span><span class="stat-label">Live</span></div>
+  <div class="stat-item"><span class="stat-num planned">${countByStatus("planned")}</span><span class="stat-label">Planned</span></div>
+  <div class="stat-item"><span class="stat-num disc">${countByStatus("discarded")}</span><span class="stat-label">Shelved</span></div>
+  <div class="stat-item"><span class="stat-num" style="color:#fff">${countByStatus("all")}</span><span class="stat-label">Total</span></div>
+`;
+
+// Filter buttons
+const filters = [
+  { key: "all",       label: "All" },
+  { key: "live",      label: "Live" },
+  { key: "planned",   label: "Planned" },
+  { key: "discarded", label: "Shelved" }
+];
+filters.forEach(f => {
+  const btn = document.createElement("button");
+  btn.className = "filter-btn" + (f.key === "all" ? " active" : "");
+  btn.innerHTML = `${f.label}<span class="count">${countByStatus(f.key)}</span>`;
+  btn.dataset.filter = f.key;
+  btn.addEventListener("click", () => {
+    activeFilter = f.key;
+    filterBar.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    applyFilters();
+  });
+  filterBar.appendChild(btn);
+});
+
+// Build DOM
+FEATURES.forEach((cat, ci) => {
+  const section = document.createElement("div");
+  section.className = "category";
+  section.dataset.index = ci;
+
+  section.innerHTML = `
+    <div class="category-header">
+      <div class="category-icon" style="background:${cat.iconBg}">${cat.icon}</div>
+      <span class="category-title">${cat.category}</span>
+      <span class="category-count">${cat.features.length} features</span>
+      <svg class="chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="6,4 12,10 6,16"/>
+      </svg>
+    </div>
+    <div class="feature-list">
+      ${cat.features.map((f, fi) => `
+        <div class="feature-card" data-cat="${ci}" data-idx="${fi}" data-status="${f.status}"
+             data-search="${(f.name + ' ' + f.desc + ' ' + (f.tags||[]).join(' ') + ' ' + (f.tab||'') + ' ' + (f.reason||'') + ' ' + (f.platform||'')).toLowerCase()}">
+          <div class="card-top">
+            <span class="feature-name">${f.name}</span>
+            <span class="status-badge ${f.status}">${f.status === 'live' ? '&#x2705; Live' : f.status === 'planned' ? '&#x1F6A7; Planned' : '&#x274C; Shelved'}</span>
+          </div>
+          <div class="feature-desc">${f.desc}</div>
+          ${f.reason ? `<div class="feature-desc" style="color:#FF3B30;font-style:italic;">Why shelved: ${f.reason}</div>` : ''}
+          <div class="card-meta">
+            ${(f.tags||[]).map(t => `<span class="meta-tag ${t.startsWith('SCRUM') ? 'scrum' : ''}">${t}</span>`).join('')}
+            ${f.tab ? `<span class="meta-tag tab">${f.tab}</span>` : ''}
+            ${f.platform ? `<span class="meta-tag platform">${f.platform}</span>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // Toggle collapse
+  section.querySelector(".category-header").addEventListener("click", () => {
+    section.classList.toggle("collapsed");
+  });
+
+  container.appendChild(section);
+});
+
+// ── Filter + Search ──────────────────────────────────────
+function applyFilters() {
+  const q = searchInput.value.toLowerCase().trim();
+  let visibleCount = 0;
+
+  document.querySelectorAll(".category").forEach(cat => {
+    const cards = cat.querySelectorAll(".feature-card");
+    let catVisible = 0;
+
+    cards.forEach(card => {
+      const matchStatus = activeFilter === "all" || card.dataset.status === activeFilter;
+      const matchSearch = !q || card.dataset.search.includes(q);
+      const show = matchStatus && matchSearch;
+      card.classList.toggle("hidden", !show);
+      if (show) { catVisible++; visibleCount++; }
+    });
+
+    cat.style.display = catVisible > 0 ? "" : "none";
+    cat.querySelector(".category-count").textContent = `${catVisible} feature${catVisible !== 1 ? 's' : ''}`;
+  });
+
+  noResults.style.display = visibleCount === 0 ? "" : "none";
+}
+
+searchInput.addEventListener("input", applyFilters);
+
+// Animate stat numbers on load
+document.querySelectorAll(".stat-num").forEach(el => {
+  const target = parseInt(el.textContent);
+  let current = 0;
+  const step = Math.max(1, Math.ceil(target / 30));
+  const interval = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current;
+    if (current >= target) clearInterval(interval);
+  }, 30);
+});
+</script>
+</body>
+</html>
