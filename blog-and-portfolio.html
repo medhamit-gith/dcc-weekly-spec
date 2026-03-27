@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCC Weekly Activities — Documentation Hub</title>
+<style>
+  :root {
+    --orange: #FF6B00;
+    --dark: #1C1C1E;
+    --card-bg: #FFFFFF;
+    --body-bg: #F5F5F7;
+    --grey: #8E8E93;
+    --green: #34C759;
+    --blue: #007AFF;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --radius: 14px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background: var(--body-bg); color: var(--dark); line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 50%, #FF6B00 150%);
+    color: #fff; padding: 56px 24px 44px; text-align: center;
+  }
+  .hero h1 { font-size: 2.2rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .hero .subtitle { font-size: 1.05rem; opacity: 0.75; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .hero .badge {
+    display: inline-block; background: var(--orange); color: #fff;
+    font-size: 0.75rem; font-weight: 600; padding: 4px 14px;
+    border-radius: 20px; margin-bottom: 12px;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 16px 64px; }
+
+  .section-title {
+    font-size: 1.2rem; font-weight: 700; margin: 32px 0 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title .icon {
+    width: 32px; height: 32px; border-radius: 8px; display: flex;
+    align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+  }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--card-bg); border-radius: var(--radius); padding: 20px;
+    box-shadow: var(--shadow); transition: transform 0.15s, box-shadow 0.15s;
+    text-decoration: none; color: var(--dark); display: block;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.12); }
+  .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: var(--dark); }
+  .card p { font-size: 0.85rem; color: #636366; margin-bottom: 10px; }
+  .card .tag {
+    display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px;
+    border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .tag.live { background: #E8F8ED; color: #1B8A38; }
+  .tag.project { background: #FFF3E0; color: #E65100; }
+  .tag.technical { background: #E3F2FD; color: #1565C0; }
+  .tag.career { background: #F3E5F5; color: #6A1B9A; }
+  .tag.cycling { background: #E8F5E9; color: #2E7D32; }
+  .tag.github { background: #F5F5F5; color: #333; }
+
+  .featured-card {
+    background: linear-gradient(135deg, #1C1C1E, #2C2C2E);
+    color: #fff; border-radius: var(--radius); padding: 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-decoration: none; display: block;
+    transition: transform 0.15s;
+  }
+  .featured-card:hover { transform: translateY(-2px); }
+  .featured-card h3 { font-size: 1.15rem; color: #fff; margin-bottom: 8px; }
+  .featured-card p { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+  .featured-card .cta {
+    display: inline-block; background: var(--orange); color: #fff;
+    padding: 8px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+    text-decoration: none;
+  }
+
+  .footer {
+    text-align: center; padding: 32px 16px; font-size: 0.8rem; color: var(--grey);
+  }
+  .footer a { color: var(--orange); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.6rem; }
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">Amit Kamat &mdash; Technical PM &amp; iOS Developer</div>
+  <h1>DCC Weekly Activities</h1>
+  <p class="subtitle">Documentation hub for the Desi Cycling Club iOS app &mdash; architecture, features, and project blog</p>
+</div>
+
+<div class="container">
+
+  <!-- Featured: Live Dashboard -->
+  <a class="featured-card" href="dcc-feature-dashboard.html">
+    <h3>Live Feature Dashboard</h3>
+    <p>Interactive dashboard with all 55+ features &mdash; search, filter by status (Live / Planned / Shelved). Pulls live data from Jira.</p>
+    <span class="cta">Open Dashboard</span>
+  </a>
+
+  <!-- Documentation -->
+  <div class="section-title">
+    <div class="icon" style="background:#E3F2FD">&#x1F4D6;</div>
+    Documentation
+  </div>
+  <div class="card-grid">
+    <a class="card" href="https://github.com/medhamit-gith/DCC-Weekly-Activities" target="_blank">
+      <h3>Source Code</h3>
+      <p>Full iOS app, Cloudflare Worker, tests, and project configuration on GitHub.</p>
+      <span class="tag github">GitHub Repo</span>
+    </a>
+    <a class="card" href="dcc-feature-dashboard.html">
+      <h3>Feature Dashboard (Static)</h3>
+      <p>Offline-capable version of the feature dashboard with all app features catalogued.</p>
+      <span class="tag live">Live</span>
+    </a>
+    <a class="card" href="https://dcc-strava.amit-r-kamat.workers.dev/features" target="_blank">
+      <h3>Feature Dashboard (Live from Jira)</h3>
+      <p>Dynamic version served by Cloudflare Worker &mdash; auto-refreshes hourly from Jira SCRUM project.</p>
+      <span class="tag live">Live</span>
+    </a>
+  </div>
+
+  <!-- Blog: Projects -->
+  <div class="section-title">
+    <div class="icon" style="background:#FFF3E0">&#x1F4BC;</div>
+    Blog &mdash; Projects
+  </div>
+  <div class="card-grid">
+    <a class="card" href="https://www.kamat.co.uk/post/dcc-weekly-activities-building-a-22k-line-ios-app-end-to-end" target="_blank">
+      <h3>DCC Weekly Activities: Building a 22K-Line iOS App End-to-End</h3>
+      <p>Flagship case study &mdash; architecture, tech stack, 55+ features, and live demo.</p>
+      <span class="tag project">Projects</span>
+    </a>
+    <a class="card" href="https://www.kamat.co.uk/post/6-key-lessons-from-building-a-dcm-revenue-tracker-in-investment-banking" target="_blank">
+      <h3>6 Key Lessons from Building a DCM Revenue Tracker</h3>
+      <p>Investment banking front office experience and how it shaped my engineering discipline.</p>
+      <span class="tag project">Projects</span>
+    </a>
+    <a class="card" href="https://www.kamat.co.uk/post/dcc-weekly-activities-building-a-live-ios-app-with-swiftui-cloudflare-workers-jira" target="_blank">
+      <h3>DCC Weekly Activities &mdash; SwiftUI, Cloudflare &amp; Jira</h3>
+      <p>Earlier writeup covering the tech stack, feature request pipeline, and Jira integration.</p>
+      <span class="tag project">Projects</span>
+    </a>
+  </div>
+
+  <!-- Blog: Technical -->
+  <div class="section-title">
+    <div class="icon" style="background:#E3F2FD">&#x1F9EA;</div>
+    Blog &mdash; Technical
+  </div>
+  <div class="card-grid">
+    <a class="card" href="https://www.kamat.co.uk/post/skills-tech-stack-what-i-bring-to-the-table" target="_blank">
+      <h3>Skills &amp; Tech Stack &mdash; What I Bring to the Table</h3>
+      <p>Living reference of skills: PM, iOS, Cloud, APIs, and AI-assisted development.</p>
+      <span class="tag technical">Technical</span>
+    </a>
+    <a class="card" href="https://www.kamat.co.uk/post/how-i-use-ai-as-a-force-multiplier-the-claude-md-pattern" target="_blank">
+      <h3>How I Use AI as a Force Multiplier: The CLAUDE.md Pattern</h3>
+      <p>AI guardrails, protected frameworks, and compile-time feature guards.</p>
+      <span class="tag technical">Technical</span>
+    </a>
+    <a class="card" href="https://www.kamat.co.uk/post/why-i-chose-cloudflare-workers-over-firebase-for-my-ios-app-backend" target="_blank">
+      <h3>Why I Chose Cloudflare Workers Over Firebase</h3>
+      <p>Architecture deep-dive: token proxy, KV caching, and the feature dashboard trick.</p>
+      <span class="tag technical">Technical</span>
+    </a>
+  </div>
+
+  <!-- Blog: Career & Cycling -->
+  <div class="section-title">
+    <div class="icon" style="background:#F3E5F5">&#x1F6B4;</div>
+    Blog &mdash; Career &amp; Cycling
+  </div>
+  <div class="card-grid">
+    <a class="card" href="https://www.kamat.co.uk/post/storybook-title-my-first-day-in-london" target="_blank">
+      <h3>My First Day in London</h3>
+      <p>February 1998 &mdash; arriving from Mumbai with one bag and &pound;200. The start of a career.</p>
+      <span class="tag career">Career</span>
+    </a>
+    <a class="card" href="https://www.kamat.co.uk/post/how-my-childhood-adventures-led-to-a-lifelong-love-for-cycling" target="_blank">
+      <h3>How My Childhood Adventures Led to a Lifelong Love for Cycling</h3>
+      <p>From rickshaw-wala rides in Nagpur to carbon bikes in London.</p>
+      <span class="tag cycling">Cycling</span>
+    </a>
+    <a class="card" href="https://www.kamat.co.uk/post/in-this-blog-post-we-delve-into-the-comprehensive-bike-fitting-session-conducted-for-my-road-bike" target="_blank">
+      <h3>Road Bike Fitting Session</h3>
+      <p>Comprehensive bike fitting analysis &mdash; saddle height, handlebar reach, cleat position.</p>
+      <span class="tag cycling">Cycling</span>
+    </a>
+  </div>
+
+</div>
+
+<div class="footer">
+  <a href="https://www.kamat.co.uk" target="_blank">kamat.co.uk</a> &bull;
+  <a href="https://github.com/medhamit-gith/DCC-Weekly-Activities" target="_blank">GitHub</a> &bull;
+  Built by Amit Kamat &mdash; Desi Cycling Club
+</div>
+
+</body>
+</html>
