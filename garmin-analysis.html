@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCRUM-84 — Garmin Health API Analysis (Option B)</title>
+<style>
+:root{--bg:#080810;--bg2:#0D0D1A;--bg3:#111120;--bg4:#16162A;--border:rgba(255,255,255,0.07);--text:#F0F0F8;--text2:rgba(240,240,248,0.6);--text3:rgba(240,240,248,0.35);--strava:#FC4C02;--green:#22C55E;--blue:#3B82F6;--gold:#F59E0B;--red:#EF4444;--purple:#A855F7;--teal:#00C9A7}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-size:13px;line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:48px 24px 80px}
+h1{font-size:32px;font-weight:900;margin-bottom:8px}
+h1 span{color:var(--strava)}
+h2{font-size:20px;font-weight:700;margin:32px 0 12px;padding-top:24px;border-top:1px solid var(--border)}
+h3{font-size:15px;font-weight:600;color:var(--blue);margin:20px 0 8px}
+p{color:var(--text2);margin-bottom:12px;line-height:1.7}
+.subtitle{color:var(--text3);font-size:14px;margin-bottom:32px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px}
+th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-weight:400}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text2)}
+tr:hover td{background:var(--bg3)}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.tag-green{background:rgba(34,197,94,0.12);color:var(--green)}
+.tag-red{background:rgba(239,68,68,0.12);color:var(--red)}
+.tag-blue{background:rgba(59,130,246,0.12);color:var(--blue)}
+.tag-gold{background:rgba(245,158,11,0.12);color:var(--gold)}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0}
+.card-title{font-size:13px;font-weight:700;margin-bottom:8px}
+ul{padding-left:20px;margin:8px 0}
+li{color:var(--text2);margin-bottom:6px;line-height:1.6}
+code{background:var(--bg4);padding:2px 6px;border-radius:4px;font-size:11px;font-family:'JetBrains Mono',monospace}
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0}
+.flow-box{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:11px;text-align:center}
+.flow-arrow{color:var(--text3);font-size:18px}
+.verdict{background:linear-gradient(135deg,rgba(34,197,94,0.08),var(--bg3));border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:24px;margin:24px 0;text-align:center}
+.verdict h3{color:var(--green);margin:0 0 8px}
+.footer{text-align:center;padding:32px 0;font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:48px}
+.footer a{color:var(--strava);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Garmin Health API <span>Analysis</span></h1>
+<p class="subtitle">SCRUM-84, Option B — Complete technical analysis for removing Strava dependency</p>
+
+<h2>1. Executive Summary</h2>
+<p>The Garmin Connect Developer Program provides official APIs for accessing cycling activity data including GPS tracks, speed, heart rate, power, cadence, and elevation — all fields that Strava's club endpoint lacks. The program is <strong>free</strong>, approval takes <strong>2 business days</strong>, and production keys have <strong>no rate limits</strong>. This is the recommended path for Garmin users in the club.</p>
+
+<div class="verdict">
+<h3>Recommendation: Apply to Garmin Developer Program</h3>
+<p>Free, fast approval, complete data access, push-based architecture. Covers the majority of DCC members who use Garmin devices.</p>
+</div>
+
+<h2>2. Data Field Comparison</h2>
+<table>
+<thead><tr><th>Field</th><th>Strava Club API</th><th>Garmin Activity API</th><th>Impact</th></tr></thead>
+<tbody>
+<tr><td>Distance</td><td><span class="tag tag-green">Yes</span> (meters)</td><td><span class="tag tag-green">Yes</span> (meters)</td><td>Equivalent</td></tr>
+<tr><td>Duration</td><td><span class="tag tag-green">Yes</span> (moving_time)</td><td><span class="tag tag-green">Yes</span> (seconds)</td><td>Equivalent</td></tr>
+<tr><td>Elevation</td><td><span class="tag tag-green">Yes</span> (total gain)</td><td><span class="tag tag-green">Yes</span> (ascent + descent)</td><td>Garmin has descent too</td></tr>
+<tr><td>Activity Type</td><td><span class="tag tag-green">Yes</span> (type, sport_type)</td><td><span class="tag tag-green">Yes</span> (activityType)</td><td>Equivalent</td></tr>
+<tr><td><strong>Start Date/Time</strong></td><td><span class="tag tag-red">No</span></td><td><span class="tag tag-green">Yes</span> (startTimeInSeconds + offset)</td><td><strong>Fixes SCRUM-69</strong> — no more fingerprint workaround</td></tr>
+<tr><td><strong>Average Speed</strong></td><td><span class="tag tag-red">No</span></td><td><span class="tag tag-green">Yes</span> (averageSpeedInMetersPerSecond)</td><td><strong>Fixes SCRUM-63</strong> — device-measured, not calculated</td></tr>
+<tr><td><strong>GPS Track</strong></td><td><span class="tag tag-red">No</span></td><td><span class="tag tag-green">Yes</span> (full route via FIT file)</td><td><strong>Enables real route-based POIs</strong> (SCRUM-83)</td></tr>
+<tr><td><strong>Heart Rate</strong></td><td><span class="tag tag-red">No</span></td><td><span class="tag tag-green">Yes</span> (avg, max, zones with durations)</td><td>New: effort/intensity analytics</td></tr>
+<tr><td><strong>Power</strong></td><td><span class="tag tag-red">No</span></td><td><span class="tag tag-green">Yes</span> (avg, max, by zone)</td><td>New: power-based coaching</td></tr>
+<tr><td><strong>Cadence</strong></td><td><span class="tag tag-red">No</span></td><td><span class="tag tag-green">Yes</span> (avg, max RPM)</td><td>New: pedalling efficiency analysis</td></tr>
+<tr><td><strong>Temperature</strong></td><td><span class="tag tag-red">No</span></td><td><span class="tag tag-green">Yes</span> (ambient from device)</td><td>New: real weather, not estimated</td></tr>
+<tr><td><strong>FIT File Download</strong></td><td><span class="tag tag-red">No</span></td><td><span class="tag tag-green">Yes</span> (raw binary file)</td><td>Complete second-by-second data</td></tr>
+<tr><td>Athlete Name</td><td><span class="tag tag-green">Yes</span></td><td><span class="tag tag-green">Yes</span> (from OAuth profile)</td><td>Equivalent</td></tr>
+<tr><td>Rate Limits</td><td>100/15min, 1000/day</td><td><strong>None</strong> (production key)</td><td>Unlimited refreshes</td></tr>
+</tbody>
+</table>
+
+<h2>3. Architecture: Push-Based Webhook</h2>
+<div class="flow">
+<div class="flow-box">Garmin Device<br><span style="color:var(--text3)">records ride</span></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box">Garmin Connect<br><span style="color:var(--text3)">sync via Bluetooth/WiFi</span></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:rgba(252,76,2,0.3)">Garmin Cloud<br><span style="color:var(--strava)">sends Ping POST</span></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:rgba(0,201,167,0.3)">Cloudflare Worker<br><span style="color:var(--teal)">/garmin-webhook</span></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box">Worker fetches<br><span style="color:var(--text3)">activity details + FIT</span></div>
+<div class="flow-arrow">→</div>
+<div class="flow-box" style="border-color:rgba(59,130,246,0.3)">KV Cache<br><span style="color:var(--blue)">aggregated stats</span></div>
+</div>
+
+<div class="card">
+<div class="card-title">How the Ping/Pull Architecture Works</div>
+<ol>
+<li>User completes a ride and syncs their Garmin device</li>
+<li>Garmin processes the activity and sends an HTTPS POST <strong>Ping notification</strong> to our webhook URL</li>
+<li>Our Worker receives the ping containing the user ID and activity ID</li>
+<li>Worker fetches the activity details (summary + FIT file) from Garmin's API</li>
+<li>Worker parses the data, extracts all metrics (GPS, speed, HR, power, cadence, elevation)</li>
+<li>Worker aggregates into club stats and stores in KV — same format as current /club-data response</li>
+<li>iOS app fetches from /club-data as before — no app changes needed for basic stats</li>
+</ol>
+</div>
+
+<h2>4. Partner Application Process</h2>
+<table>
+<thead><tr><th>Step</th><th>Details</th><th>Timeline</th></tr></thead>
+<tbody>
+<tr><td>1. Apply</td><td>Submit application at <code>developer.garmin.com/gc-developer-program</code>. Requires business name, use case description, expected user count.</td><td>30 minutes</td></tr>
+<tr><td>2. Review</td><td>Garmin reviews the application. Most approvals within 2 business days.</td><td>1-2 days</td></tr>
+<tr><td>3. Credentials</td><td>Receive Consumer Key + Consumer Secret. Access to evaluation environment + full API docs.</td><td>Immediate after approval</td></tr>
+<tr><td>4. Integration</td><td>Build OAuth flow, webhook handler, FIT parser. Test with 2+ real Garmin accounts.</td><td>1-2 weeks dev work</td></tr>
+<tr><td>5. Verification</td><td>Pass Partner Verification Tool: (a) only call summary endpoints after Ping, (b) webhook responds HTTP 200, (c) data from 2+ real accounts.</td><td>1-2 days testing</td></tr>
+<tr><td>6. Production Key</td><td>Receive production key with no rate limits. Go live.</td><td>Immediate after verification</td></tr>
+</tbody>
+</table>
+<p><strong>Total timeline: ~2-3 weeks from application to production.</strong></p>
+
+<h2>5. Authentication Flow (OAuth 2.0)</h2>
+<div class="card">
+<div class="card-title">User Authorisation (One-Time)</div>
+<ol>
+<li>User taps "Connect Garmin" in the DCC app</li>
+<li>App opens Garmin's OAuth page in a browser: <code>https://connect.garmin.com/oauthConfirm</code></li>
+<li>User logs in to Garmin Connect and grants permission</li>
+<li>Garmin redirects back to the app with an authorisation code</li>
+<li>Worker exchanges the code for an <strong>access token</strong> (valid 3 months) + <strong>refresh token</strong></li>
+<li>Tokens stored in KV per user. Auto-refresh when expired — no user action needed.</li>
+<li>From this point, all rides sync automatically via webhook. User never touches it again.</li>
+</ol>
+</div>
+
+<h2>6. Implementation Plan</h2>
+<table>
+<thead><tr><th>Phase</th><th>Work</th><th>Effort</th><th>Files</th></tr></thead>
+<tbody>
+<tr><td><strong>Phase 1</strong></td><td>Apply to Garmin Developer Program</td><td>30 min</td><td>None (web form)</td></tr>
+<tr><td><strong>Phase 2</strong></td><td>Add <code>POST /garmin-webhook</code> endpoint to Worker. Handle Ping notifications, fetch activity details, parse into club data format.</td><td>2-3 days</td><td>cloudflare-club-data-worker.js</td></tr>
+<tr><td><strong>Phase 3</strong></td><td>Add FIT file parser to Worker (binary format). Extract GPS track, speed, HR, power, cadence per data point.</td><td>2-3 days</td><td>New: fit-parser.js or use garmin-fit-parser npm</td></tr>
+<tr><td><strong>Phase 4</strong></td><td>Add "Connect Garmin" button in iOS app. OAuth flow via ASWebAuthenticationSession. Store tokens via Worker.</td><td>1-2 days</td><td>New: GarminAuthView.swift</td></tr>
+<tr><td><strong>Phase 5</strong></td><td>Merge Garmin data with existing Strava data in /club-data response. Both sources feed the same stats.</td><td>1-2 days</td><td>cloudflare-club-data-worker.js</td></tr>
+<tr><td><strong>Phase 6</strong></td><td>Partner Verification Tool + production key</td><td>1-2 days</td><td>Testing only</td></tr>
+</tbody>
+</table>
+<p><strong>Total effort: ~2 weeks of development + 2 days for Garmin approval.</strong></p>
+
+<h2>7. Privacy & GDPR</h2>
+<div class="card">
+<div class="card-title">Requirements</div>
+<ul>
+<li><strong>Explicit consent</strong> — Users must actively opt in to share Garmin data with DCC. No pre-ticked boxes.</li>
+<li><strong>Granular permissions</strong> — Only request "Activity Export" permission, not full health data.</li>
+<li><strong>Revoke anytime</strong> — Users can disconnect Garmin from the DCC app at any time. Must call Garmin's disconnect endpoint.</li>
+<li><strong>Data subject rights</strong> — Support access, rectify, erase, object, restrict, and export requests.</li>
+<li><strong>Privacy policy update</strong> — Must include link to Garmin Connect Privacy Policy and explain what data is collected.</li>
+<li><strong>Data retention</strong> — Define how long Garmin activity data is stored (recommend: same as current 60-day KV TTL).</li>
+</ul>
+</div>
+
+<h2>8. Risk Assessment</h2>
+<table>
+<thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td>Garmin rejects application</td><td><span class="tag tag-green">Low</span></td><td>High</td><td>Application is free and straightforward. Cycling club use case is standard.</td></tr>
+<tr><td>FIT parsing complexity</td><td><span class="tag tag-gold">Medium</span></td><td>Medium</td><td>Use established npm package (garmin-fit-parser). FIT SDK is well-documented.</td></tr>
+<tr><td>User adoption friction</td><td><span class="tag tag-gold">Medium</span></td><td>Medium</td><td>One-time OAuth. After that, fully automatic. Strava stays as fallback.</td></tr>
+<tr><td>Garmin API changes</td><td><span class="tag tag-green">Low</span></td><td>Medium</td><td>Official API with versioning. More stable than Strava's undocumented club endpoint.</td></tr>
+<tr><td>GDPR compliance burden</td><td><span class="tag tag-gold">Medium</span></td><td>Low</td><td>Standard consent flow. Same pattern as existing Strava OAuth (but we use club code now).</td></tr>
+</tbody>
+</table>
+
+<h2>9. What This Unlocks</h2>
+<div class="card">
+<div class="card-title">Features enabled by Garmin data that are impossible with Strava</div>
+<ul>
+<li><strong>Accurate ride dates</strong> — No more fingerprint workaround. Rides assigned to the correct day.</li>
+<li><strong>GPS route mapping</strong> — Plot actual routes on a map. Show bike shops and cafes ON the route, not "near me".</li>
+<li><strong>Heart rate zones</strong> — Know how hard each ride was. Zone 2 endurance vs Zone 5 sprints.</li>
+<li><strong>Power analysis</strong> — FTP estimation, TSS (Training Stress Score), power-to-weight ratio.</li>
+<li><strong>Cadence coaching</strong> — Optimal pedalling efficiency tips based on actual RPM data.</li>
+<li><strong>Real weather</strong> — Device temperature sensor gives actual conditions, not estimates.</li>
+<li><strong>True route matching</strong> — Compare riders on the same GPS route, not just similar distance/elevation.</li>
+<li><strong>Unlimited data refreshes</strong> — No rate limits on production key.</li>
+<li><strong>Members without Strava</strong> — Garmin-only users can participate in the club.</li>
+</ul>
+</div>
+
+<h2>10. Recommendation</h2>
+<div class="verdict">
+<h3>Proceed with Official Garmin API</h3>
+<p style="color:var(--text2)">Apply today. Free, 2-day approval, 2 weeks to integrate. Keeps Strava as fallback. Unlocks GPS, HR, power, cadence — transforming the app from a stats viewer into a proper training platform.</p>
+</div>
+
+</div>
+<div class="footer">
+<a href="index.html">Architecture Spec</a> · <a href="data-flow.html">Data Flow</a> · <a href="feature-dashboard.html">Feature Dashboard</a><br>
+Desi Cycling Club · SCRUM-84 Analysis · April 2026
+</div>
+</body>
+</html>
