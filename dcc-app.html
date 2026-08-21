@@ -960,6 +960,7 @@ select { font-family: inherit; }
 }
 .fr-btn-primary { background: var(--orange); border-color: var(--orange); color: #fff; }
 .fr-btn:disabled { opacity: 0.5; cursor: default; }
+.fr-count { font-size: 12px; color: var(--text3); text-align: right; margin-top: 4px; }
 .fr-status { font-size: 13px; margin-top: 10px; min-height: 18px; }
 .fr-status.ok { color: var(--green); }
 .fr-status.err { color: var(--zone-elite); }
@@ -1066,6 +1067,7 @@ select { font-family: inherit; }
       <div class="fr-title" id="fr-title">Suggest a Feature</div>
       <div class="fr-sub">Your idea goes straight to the DCC backlog as a Jira ticket.</div>
       <textarea class="fr-textarea" id="fr-text" maxlength="1000" placeholder="What would make the app better? (min 10 characters)"></textarea>
+      <div class="fr-count" id="fr-count">0 / 1000</div>
       <div class="fr-status" id="fr-status"></div>
       <div class="fr-actions">
         <button class="fr-btn" id="fr-cancel">Cancel</button>
@@ -2394,14 +2396,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const cancelEl = document.getElementById('fr-cancel');
   if (!fab || !overlay) return;
 
+  const countEl = document.getElementById('fr-count');
+  const COOLDOWN_MS = 60000;
+  let cooldownUntil = 0;
+
   function open()  { overlay.classList.add('open'); textEl.focus(); }
   function close() { overlay.classList.remove('open'); statusEl.textContent = ''; statusEl.className = 'fr-status'; }
+
+  textEl.addEventListener('input', () => {
+    countEl.textContent = textEl.value.length + ' / 1000';
+  });
 
   fab.addEventListener('click', open);
   cancelEl.addEventListener('click', close);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
 
   submitEl.addEventListener('click', async () => {
+    const remaining = Math.ceil((cooldownUntil - Date.now()) / 1000);
+    if (remaining > 0) {
+      statusEl.textContent = 'Please wait ' + remaining + 's before submitting another request.';
+      statusEl.className = 'fr-status err';
+      return;
+    }
     const text = textEl.value.trim();
     if (text.length < 10) {
       statusEl.textContent = 'Please write at least 10 characters.';
@@ -2430,6 +2446,8 @@ document.addEventListener('DOMContentLoaded', () => {
           : 'Thanks! Your idea has been submitted.';
         statusEl.className = 'fr-status ok';
         textEl.value = '';
+        countEl.textContent = '0 / 1000';
+        cooldownUntil = Date.now() + COOLDOWN_MS;
         setTimeout(close, 2500);
       } else {
         statusEl.textContent = data.error || 'Submission failed. Try again later.';
