@@ -902,6 +902,67 @@ select { font-family: inherit; }
   .insight-grid { grid-template-columns: repeat(4, 1fr); }
   .achievement-grid { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ── FEATURE REQUEST FAB (SCRUM-76) ── */
+.fab-feature {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px);
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--orange);
+  color: #fff;
+  font-size: 24px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+  cursor: pointer;
+  z-index: 60;
+}
+.fab-feature:active { transform: scale(0.94); }
+.fr-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 70;
+}
+.fr-overlay.open { display: flex; }
+.fr-sheet {
+  width: 100%; max-width: 480px;
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+  border: 1px solid var(--border);
+  padding: 20px 16px calc(16px + var(--safe-bottom));
+}
+.fr-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.fr-sub { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+.fr-textarea {
+  width: 100%; min-height: 110px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font: inherit;
+  padding: 10px;
+  resize: vertical;
+}
+.fr-actions { display: flex; gap: 10px; margin-top: 12px; }
+.fr-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font: inherit; font-weight: 600;
+  cursor: pointer;
+}
+.fr-btn-primary { background: var(--orange); border-color: var(--orange); color: #fff; }
+.fr-btn:disabled { opacity: 0.5; cursor: default; }
+.fr-status { font-size: 13px; margin-top: 10px; min-height: 18px; }
+.fr-status.ok { color: var(--green); }
+.fr-status.err { color: var(--zone-elite); }
 </style>
 </head>
 <body>
@@ -997,6 +1058,21 @@ select { font-family: inherit; }
       <span>My Stats</span>
     </button>
   </nav>
+
+  <!-- Feature request FAB (SCRUM-76) -->
+  <button class="fab-feature" id="fab-feature" title="Suggest a feature" aria-label="Suggest a feature">&#128161;</button>
+  <div class="fr-overlay" id="fr-overlay" role="dialog" aria-modal="true" aria-labelledby="fr-title">
+    <div class="fr-sheet">
+      <div class="fr-title" id="fr-title">Suggest a Feature</div>
+      <div class="fr-sub">Your idea goes straight to the DCC backlog as a Jira ticket.</div>
+      <textarea class="fr-textarea" id="fr-text" maxlength="1000" placeholder="What would make the app better? (min 10 characters)"></textarea>
+      <div class="fr-status" id="fr-status"></div>
+      <div class="fr-actions">
+        <button class="fr-btn" id="fr-cancel">Cancel</button>
+        <button class="fr-btn fr-btn-primary" id="fr-submit">Submit</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Chart.js CDN -->
@@ -1013,7 +1089,7 @@ const CONFIG = {
   WORKER_URL:   'https://dcc-strava.amit-r-kamat.workers.dev/club-data',
   MIN_OFFSET:   -2,
   MAX_OFFSET:   0,
-  CACHE_NAME:   'dcc-pwa-v2'
+  CACHE_NAME:   'dcc-pwa-v3'
 };
 
 const SAMPLE = {
@@ -2306,6 +2382,67 @@ document.addEventListener('DOMContentLoaded', () => {
   registerServiceWorker();
   checkAuth();
 });
+
+// ── FEATURE REQUEST FAB (SCRUM-76) ──────────────────────────────────────────
+(function initFeatureRequest() {
+  const FEATURE_URL = CONFIG.WORKER_URL.replace('/club-data', '/feature-request');
+  const fab      = document.getElementById('fab-feature');
+  const overlay  = document.getElementById('fr-overlay');
+  const textEl   = document.getElementById('fr-text');
+  const statusEl = document.getElementById('fr-status');
+  const submitEl = document.getElementById('fr-submit');
+  const cancelEl = document.getElementById('fr-cancel');
+  if (!fab || !overlay) return;
+
+  function open()  { overlay.classList.add('open'); textEl.focus(); }
+  function close() { overlay.classList.remove('open'); statusEl.textContent = ''; statusEl.className = 'fr-status'; }
+
+  fab.addEventListener('click', open);
+  cancelEl.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  submitEl.addEventListener('click', async () => {
+    const text = textEl.value.trim();
+    if (text.length < 10) {
+      statusEl.textContent = 'Please write at least 10 characters.';
+      statusEl.className = 'fr-status err';
+      return;
+    }
+    submitEl.disabled = true;
+    statusEl.textContent = 'Submitting\u2026';
+    statusEl.className = 'fr-status';
+    try {
+      const res = await fetch(FEATURE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          submitter: localStorage.getItem(CONFIG.RIDER_KEY) || 'DCC Member (PWA)',
+          platform: 'android-pwa',
+          appVersion: CONFIG.CACHE_NAME,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        statusEl.textContent = data.issue_key
+          ? 'Thanks! Submitted as ' + data.issue_key + '.'
+          : 'Thanks! Your idea has been submitted.';
+        statusEl.className = 'fr-status ok';
+        textEl.value = '';
+        setTimeout(close, 2500);
+      } else {
+        statusEl.textContent = data.error || 'Submission failed. Try again later.';
+        statusEl.className = 'fr-status err';
+      }
+    } catch {
+      statusEl.textContent = 'You appear to be offline. Try again when connected.';
+      statusEl.className = 'fr-status err';
+    } finally {
+      submitEl.disabled = false;
+    }
+  });
+})();
 </script>
 </body>
 </html>
